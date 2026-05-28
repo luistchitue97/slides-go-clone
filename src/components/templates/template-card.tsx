@@ -1,18 +1,13 @@
 import Link from "next/link";
-import Image from "next/image";
 import { CATEGORY_LABELS, type Template } from "@/types/template";
+import { CardMedia } from "@/components/templates/card-media";
 
 type Props = {
   template: Template;
-  /** Optional priority hint for above-the-fold images. */
+  /** Optional priority hint for above-the-fold thumbnails. */
   priority?: boolean;
 };
 
-/**
- * Static card used on the landing page and gallery. Video preview wiring
- * (hover/tap autoplay, lazy loading, fallback chain) lands in Phase 4 — for
- * now the card always shows the static thumbnail.
- */
 export function TemplateCard({ template, priority = false }: Props) {
   return (
     <Link
@@ -21,17 +16,15 @@ export function TemplateCard({ template, priority = false }: Props) {
       aria-label={`${template.title} — ${CATEGORY_LABELS[template.category]}`}
     >
       <div className="relative aspect-[16/9] overflow-hidden bg-ink-800">
-        <Image
-          src={template.thumbnailUrl}
+        <CardMedia
+          thumbnailUrl={template.thumbnailUrl}
+          previewVideoUrl={template.previewVideoUrl}
           alt=""
-          role="presentation"
-          fill
           sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
           priority={priority}
-          className="object-cover transition duration-500 group-hover:scale-[1.03]"
         />
         {template.isNew ? (
-          <span className="absolute left-3 top-3 rounded-full bg-white/95 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-ink-900">
+          <span className="absolute left-3 top-3 z-10 rounded-full bg-white/95 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-ink-900">
             New
           </span>
         ) : null}

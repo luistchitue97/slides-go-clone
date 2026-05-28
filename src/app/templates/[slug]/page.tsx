@@ -1,10 +1,11 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getTemplate } from "@/lib/data";
 import { isLaunchable } from "@/lib/url";
 import { CATEGORY_LABELS } from "@/types/template";
+import { Reveal } from "@/components/motion/reveal";
+import { ImageWithFallback } from "@/components/templates/image-with-fallback";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -40,8 +41,8 @@ export default async function TemplateDetailPage({ params }: Props) {
         <span aria-hidden>←</span> Back to gallery
       </Link>
 
-      <header className="mt-6 flex flex-col gap-4">
-        <div className="flex flex-wrap items-center gap-2">
+      <Reveal as="header" className="mt-6 flex flex-col gap-4" stagger immediate>
+        <div data-reveal className="flex flex-wrap items-center gap-2">
           <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-xs font-medium uppercase tracking-wider text-ink-200">
             {CATEGORY_LABELS[template.category]}
           </span>
@@ -51,14 +52,19 @@ export default async function TemplateDetailPage({ params }: Props) {
             </span>
           ) : null}
         </div>
-        <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+        <h1
+          data-reveal
+          className="text-4xl font-semibold tracking-tight text-white sm:text-5xl"
+        >
           {template.title}
         </h1>
-        <p className="max-w-2xl text-lg text-ink-200">{template.shortDescription}</p>
-      </header>
+        <p data-reveal className="max-w-2xl text-lg text-ink-200">
+          {template.shortDescription}
+        </p>
+      </Reveal>
 
       <div className="mt-10 relative aspect-[16/9] overflow-hidden rounded-2xl border border-white/10 bg-ink-800 shadow-lift">
-        <Image
+        <ImageWithFallback
           src={template.thumbnailUrl}
           alt={`${template.title} preview`}
           fill

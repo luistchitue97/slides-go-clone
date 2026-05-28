@@ -2,6 +2,7 @@ import { CategoryPills } from "@/components/gallery/category-pills";
 import { GalleryControls } from "@/components/gallery/gallery-controls";
 import { EmptyState } from "@/components/gallery/empty-state";
 import { TemplateCard } from "@/components/templates/template-card";
+import { Reveal } from "@/components/motion/reveal";
 import { getTemplates, parseCategory, parseSearch, parseSort } from "@/lib/data";
 
 export const metadata = {
@@ -22,9 +23,14 @@ export default async function GalleryPage({ searchParams }: { searchParams: Sear
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:py-16">
-      <header className="flex flex-col gap-2">
-        <p className="text-xs font-medium uppercase tracking-wider text-accent-500">Gallery</p>
-        <div className="flex flex-wrap items-end justify-between gap-3">
+      <Reveal as="header" className="flex flex-col gap-2" stagger immediate>
+        <p
+          data-reveal
+          className="text-xs font-medium uppercase tracking-wider text-accent-500"
+        >
+          Gallery
+        </p>
+        <div data-reveal className="flex flex-wrap items-end justify-between gap-3">
           <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             Browse the library
           </h1>
@@ -32,7 +38,7 @@ export default async function GalleryPage({ searchParams }: { searchParams: Sear
             {count} template{count === 1 ? "" : "s"}
           </p>
         </div>
-      </header>
+      </Reveal>
 
       <div className="mt-8 space-y-5">
         <CategoryPills active={category} search={search} sort={sort} />

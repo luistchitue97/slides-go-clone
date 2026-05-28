@@ -8,7 +8,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 type Props = {
-  as?: "div" | "section" | "ul" | "ol";
+  as?: "div" | "section" | "ul" | "ol" | "header";
   className?: string;
   /** Stagger reveal of direct children with [data-reveal] attribute. */
   stagger?: boolean;
@@ -26,6 +26,9 @@ type Props = {
  * and prefers-reduced-motion is "no-preference", we set them to a slight
  * off-state and animate in. If JS fails or motion is reduced, the visible
  * default remains — content is never blocked.
+ *
+ * useGSAP({ scope }) cleans up tweens and ScrollTriggers when the component
+ * unmounts, so navigation never leaks animations.
  */
 export function Reveal({
   as: Tag = "div",
@@ -72,6 +75,13 @@ export function Reveal({
           });
         }
       });
+
+      // After web fonts finish loading the text may reflow, which moves any
+      // already-registered scroll triggers off their measured positions.
+      // A single refresh once fonts settle keeps them accurate.
+      if (typeof document !== "undefined" && "fonts" in document) {
+        document.fonts.ready.then(() => ScrollTrigger.refresh()).catch(() => {});
+      }
 
       return () => mm.revert();
     },
