@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#04061a"/>
+      <stop offset="100%" stop-color="#141869"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#g)"/>
+  <g fill="#ffffff" font-family="ui-sans-serif, system-ui">
+    <text x="80" y="170" font-size="32" opacity="0.7" letter-spacing="6">INVESTING · SERIES A</text>
+    <text x="80" y="320" font-size="120" font-weight="700">Series A</text>
+    <text x="80" y="430" font-size="120" font-weight="700" opacity="0.85">Data Room</text>
+  </g>
+  <g fill="#ffffff" opacity="0.7">
+    <rect x="900" y="540" width="600" height="60" rx="6"/>
+    <rect x="900" y="620" width="600" height="60" rx="6" opacity="0.6"/>
+    <rect x="900" y="700" width="600" height="60" rx="6" opacity="0.5"/>
+  </g>
+</svg>

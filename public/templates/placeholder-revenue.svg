@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2d004f"/>
+      <stop offset="100%" stop-color="#ff944d"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#g)"/>
+  <g fill="#ffffff" font-family="ui-sans-serif, system-ui">
+    <text x="80" y="170" font-size="32" opacity="0.7" letter-spacing="6">SALES · PLAYBOOK</text>
+    <text x="80" y="320" font-size="120" font-weight="700">Revenue</text>
+    <text x="80" y="430" font-size="120" font-weight="700" opacity="0.85">Playbook</text>
+  </g>
+  <g stroke="#ffffff" stroke-width="4" fill="none" opacity="0.7">
+    <path d="M 80 760 L 1520 560" />
+    <circle cx="80" cy="760" r="10" fill="#ffffff"/>
+    <circle cx="500" cy="700" r="10" fill="#ffffff"/>
+    <circle cx="1000" cy="640" r="10" fill="#ffffff"/>
+    <circle cx="1520" cy="560" r="14" fill="#ffffff"/>
+  </g>
+</svg>

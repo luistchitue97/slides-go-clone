@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3d0a18"/>
+      <stop offset="100%" stop-color="#b94e2e"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#g)"/>
+  <g fill="#ffffff" font-family="ui-sans-serif, system-ui">
+    <text x="80" y="170" font-size="32" opacity="0.7" letter-spacing="6">OPS · POSTMORTEM</text>
+    <text x="80" y="320" font-size="120" font-weight="700">Ops Incident</text>
+    <text x="80" y="430" font-size="120" font-weight="700" opacity="0.85">Review</text>
+  </g>
+  <g stroke="#ffffff" stroke-width="3" opacity="0.6">
+    <line x1="80" y1="640" x2="1520" y2="640"/>
+    <circle cx="200" cy="640" r="10" fill="#ffffff"/>
+    <circle cx="600" cy="640" r="10" fill="#ffffff"/>
+    <circle cx="900" cy="640" r="10" fill="#ffffff"/>
+    <circle cx="1400" cy="640" r="10" fill="#ffffff"/>
+  </g>
+</svg>

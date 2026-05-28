@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b1b3a"/>
+      <stop offset="100%" stop-color="#3a44e6"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#g)"/>
+  <g fill="#ffffff" font-family="ui-sans-serif, system-ui">
+    <text x="80" y="170" font-size="32" opacity="0.7" letter-spacing="6">QBR · EXEC</text>
+    <text x="80" y="320" font-size="110" font-weight="700">Quarterly</text>
+    <text x="80" y="430" font-size="110" font-weight="700" opacity="0.85">Business Review</text>
+  </g>
+  <g fill="#ffffff" opacity="0.85">
+    <rect x="80" y="640" width="120" height="180" rx="8"/>
+    <rect x="220" y="700" width="120" height="120" rx="8" opacity="0.7"/>
+    <rect x="360" y="560" width="120" height="260" rx="8" opacity="0.6"/>
+    <rect x="500" y="620" width="120" height="200" rx="8" opacity="0.7"/>
+    <rect x="640" y="500" width="120" height="320" rx="8"/>
+  </g>
+</svg>
