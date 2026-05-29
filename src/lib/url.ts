@@ -19,3 +19,21 @@ export function isLaunchable(template: Template): boolean {
   if (template.disabled) return false;
   return isExternalHttpUrl(template.launchUrl);
 }
+
+/**
+ * One of three states a launch CTA can be in. Centralized so the detail
+ * page (and any future surface) reads from one source.
+ *
+ *   - "open"        → user is entitled; render <a href={launchUrl}>
+ *   - "buy"         → template is healthy but user hasn't paid; render Buy CTA
+ *   - "unavailable" → template itself is broken/disabled; render disabled state
+ *
+ * Callers must NOT render launchUrl unless the returned state is "open" —
+ * leaking the URL to unentitled users defeats the paywall.
+ */
+export type LaunchState = "open" | "buy" | "unavailable";
+
+export function getLaunchState(template: Template, allAccess: boolean): LaunchState {
+  if (!isLaunchable(template)) return "unavailable";
+  return allAccess ? "open" : "buy";
+}

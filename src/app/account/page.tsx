@@ -1,14 +1,27 @@
 import { withAuth } from "@workos-inc/authkit-nextjs";
+import { desc, eq } from "drizzle-orm";
 import { signOutAction } from "@/lib/auth-actions";
+import { db } from "@/db";
+import { purchases } from "@/db/schema";
+import { getEntitlements } from "@/lib/entitlements";
 
 export const metadata = { title: "Account" };
 
-export default async function AccountPage() {
+type SearchParams = Promise<{ purchase?: string }>;
+
+export default async function AccountPage({ searchParams }: { searchParams: SearchParams }) {
   // Middleware already ensures we're signed in here, but ensureSignedIn
   // makes the type narrow and re-redirects if a stale token slips through.
   const { user, impersonator } = await withAuth({ ensureSignedIn: true });
+  const { purchase } = await searchParams;
+
+  const [entitlements, history] = await Promise.all([
+    getEntitlements(user.id),
+    getPurchaseHistorySafe(user.id),
+  ]);
 
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
+  const showSuccess = purchase === "success";
 
   return (
     <section className="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-16 sm:px-6">
@@ -17,6 +30,8 @@ export default async function AccountPage() {
         <h1 className="text-3xl font-semibold tracking-tight text-white">{fullName}</h1>
         <p className="text-ink-200">{user.email}</p>
       </header>
+
+      {showSuccess ? <PurchaseSuccessBanner allAccess={entitlements.allAccess} /> : null}
 
       {impersonator ? (
         <p className="rounded-lg border border-amber-400/30 bg-amber-400/10 p-3 text-sm text-amber-200">
@@ -33,7 +48,15 @@ export default async function AccountPage() {
           <dt className="text-ink-300">Email verified</dt>
           <dd className="mt-1 text-ink-100">{user.emailVerified ? "Yes" : "No"}</dd>
         </div>
+        <div>
+          <dt className="text-ink-300">Plan</dt>
+          <dd className="mt-1 text-ink-100">
+            {entitlements.allAccess ? "All-access · lifetime" : "Free"}
+          </dd>
+        </div>
       </dl>
+
+      <PurchaseHistory rows={history} />
 
       <form action={signOutAction}>
         <button
@@ -45,4 +68,103 @@ export default async function AccountPage() {
       </form>
     </section>
   );
+}
+
+function PurchaseSuccessBanner({ allAccess }: { allAccess: boolean }) {
+  if (allAccess) {
+    return (
+      <p
+        role="status"
+        className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 p-3 text-sm text-emerald-100"
+      >
+        You&apos;re in. Every template is unlocked — head to the gallery to open one.
+      </p>
+    );
+  }
+  // Payment succeeded on Stripe's end but our webhook hasn't recorded it
+  // yet. Don't pretend access is granted; just tell the user to give it a
+  // moment.
+  return (
+    <p
+      role="status"
+      className="rounded-lg border border-amber-400/30 bg-amber-400/10 p-3 text-sm text-amber-200"
+    >
+      Your purchase is being processed. Refresh in a few seconds — if it stays this way after a
+      minute, drop us a note.
+    </p>
+  );
+}
+
+function PurchaseHistory({
+  rows,
+}: {
+  rows: Array<{ id: string; kind: string; amountCents: number; currency: string; purchasedAt: Date }>;
+}) {
+  if (rows.length === 0) {
+    return (
+      <section className="rounded-xl border border-dashed border-white/10 bg-white/[0.02] p-5 text-sm text-ink-300">
+        <h2 className="text-base font-medium text-white">Purchases</h2>
+        <p className="mt-1">No purchases yet.</p>
+      </section>
+    );
+  }
+  return (
+    <section className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
+      <h2 className="text-base font-medium text-white">Purchases</h2>
+      <ul className="mt-3 divide-y divide-white/5 text-sm">
+        {rows.map((row) => (
+          <li key={row.id} className="flex items-center justify-between py-3">
+            <div>
+              <p className="text-ink-100">{labelFor(row.kind)}</p>
+              <p className="text-xs text-ink-300">
+                {row.purchasedAt.toLocaleDateString(undefined, {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })}
+              </p>
+            </div>
+            <p className="font-mono text-ink-100">{formatMoney(row.amountCents, row.currency)}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function labelFor(kind: string): string {
+  if (kind === "all_access") return "DeckForge All-Access — lifetime";
+  if (kind.startsWith("template:")) return `Template — ${kind.slice("template:".length)}`;
+  return kind;
+}
+
+function formatMoney(cents: number, currency: string): string {
+  try {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency.toUpperCase(),
+      maximumFractionDigits: 0,
+    }).format(cents / 100);
+  } catch {
+    return `${currency.toUpperCase()} ${(cents / 100).toFixed(2)}`;
+  }
+}
+
+async function getPurchaseHistorySafe(userId: string) {
+  try {
+    return await db
+      .select({
+        id: purchases.id,
+        kind: purchases.kind,
+        amountCents: purchases.amountCents,
+        currency: purchases.currency,
+        purchasedAt: purchases.purchasedAt,
+      })
+      .from(purchases)
+      .where(eq(purchases.userId, userId))
+      .orderBy(desc(purchases.purchasedAt));
+  } catch (err) {
+    console.error("[account] failed to load purchase history:", err);
+    return [];
+  }
 }

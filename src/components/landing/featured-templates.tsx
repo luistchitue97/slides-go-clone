@@ -3,8 +3,17 @@ import { getFeaturedTemplates } from "@/lib/data";
 import { TemplateCard } from "@/components/templates/template-card";
 import { Reveal } from "@/components/motion/reveal";
 
-export async function FeaturedTemplates() {
+type Props = {
+  signedIn: boolean;
+  allAccess: boolean;
+};
+
+export async function FeaturedTemplates({ signedIn, allAccess }: Props) {
   const templates = await getFeaturedTemplates(3);
+  // Show the lock indicator only to signed-in users who haven't purchased.
+  // Anonymous visitors aren't being pressured to pay yet — they need to sign
+  // up first, and the lock would feel like a bait-and-switch.
+  const locked = signedIn && !allAccess;
 
   return (
     <section className="border-t border-white/5">
@@ -40,7 +49,7 @@ export async function FeaturedTemplates() {
         >
           {templates.map((t, i) => (
             <li key={t.slug} data-reveal>
-              <TemplateCard template={t} priority={i === 0} />
+              <TemplateCard template={t} priority={i === 0} locked={locked} />
             </li>
           ))}
         </Reveal>

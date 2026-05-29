@@ -1,11 +1,15 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { withAuth } from "@workos-inc/authkit-nextjs";
 import { getTemplate } from "@/lib/data";
-import { isLaunchable } from "@/lib/url";
+import { getLaunchState } from "@/lib/url";
 import { CATEGORY_LABELS } from "@/types/template";
 import { Reveal } from "@/components/motion/reveal";
 import { ImageWithFallback } from "@/components/templates/image-with-fallback";
+import { getEntitlements } from "@/lib/entitlements";
+import { getAllAccessPrice } from "@/lib/stripe";
+import { startCheckout } from "@/lib/checkout-actions";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -30,7 +34,15 @@ export default async function TemplateDetailPage({ params }: Props) {
   const template = await getTemplate(slug);
   if (!template) notFound();
 
-  const launchable = isLaunchable(template);
+  // Route is auth-gated by middleware, so user is non-null here.
+  const { user } = await withAuth({ ensureSignedIn: true });
+  const entitlements = await getEntitlements(user.id);
+  const state = getLaunchState(template, entitlements.allAccess);
+
+  // Price is only needed for the buy state; skip the Stripe round-trip
+  // otherwise. Errors here would otherwise break the page for entitled
+  // users with valid templates.
+  const price = state === "buy" ? await getAllAccessPriceSafe() : null;
 
   return (
     <article className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:py-16">
@@ -99,8 +111,11 @@ export default async function TemplateDetailPage({ params }: Props) {
         </div>
 
         <aside className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
-          <p className="text-xs font-medium uppercase tracking-wider text-ink-300">Launch</p>
-          {launchable ? (
+          <p className="text-xs font-medium uppercase tracking-wider text-ink-300">
+            {state === "buy" ? "Get access" : "Launch"}
+          </p>
+
+          {state === "open" ? (
             <>
               <a
                 href={template.launchUrl}
@@ -114,6 +129,21 @@ export default async function TemplateDetailPage({ params }: Props) {
               </a>
               <p className="mt-3 text-xs text-ink-300">
                 Opens the deployed template in a new tab.
+              </p>
+            </>
+          ) : state === "buy" ? (
+            <>
+              <form action={startCheckout}>
+                <input type="hidden" name="returnSlug" value={template.slug} />
+                <button
+                  type="submit"
+                  className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-ink-900 shadow-lift transition hover:bg-white/90"
+                >
+                  {price ? `Buy access — ${price.display}` : "Get all-access"}
+                </button>
+              </form>
+              <p className="mt-3 text-xs text-ink-300">
+                One-time payment, lifetime access to every template.
               </p>
             </>
           ) : (
@@ -152,4 +182,18 @@ export default async function TemplateDetailPage({ params }: Props) {
       </div>
     </article>
   );
+}
+
+/**
+ * Wraps getAllAccessPrice so a misconfigured Stripe env (missing
+ * STRIPE_PRICE_ALL_ACCESS, dead lookup_key, etc.) degrades the buy CTA to
+ * a generic "Get all-access" label instead of blowing up the page.
+ */
+async function getAllAccessPriceSafe() {
+  try {
+    return await getAllAccessPrice();
+  } catch (err) {
+    console.error("[templates/detail] failed to load all-access price:", err);
+    return null;
+  }
 }

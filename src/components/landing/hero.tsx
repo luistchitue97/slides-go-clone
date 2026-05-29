@@ -1,8 +1,16 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Reveal } from "@/components/motion/reveal";
+import { startCheckout } from "@/lib/checkout-actions";
 
-export function Hero({ signedIn }: { signedIn: boolean }) {
+type Props = {
+  signedIn: boolean;
+  allAccess: boolean;
+  /** Pre-formatted price string from getAllAccessPrice, or null on misconfig. */
+  priceDisplay: string | null;
+};
+
+export function Hero({ signedIn, allAccess, priceDisplay }: Props) {
   return (
     <section className="relative overflow-hidden">
       {/* Ambient gradient — purely decorative, ignored by AT. */}
@@ -21,7 +29,7 @@ export function Hero({ signedIn }: { signedIn: boolean }) {
             className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs uppercase tracking-wider text-ink-200"
           >
             <span className="size-1.5 rounded-full bg-accent-500" />
-            New decks every week
+            {allAccess ? "All-access active" : "New decks every week"}
           </p>
           <h1
             data-reveal
@@ -34,12 +42,11 @@ export function Hero({ signedIn }: { signedIn: boolean }) {
             finance reports. Open the one you need in a single click.
           </p>
           <div data-reveal className="mt-8 flex flex-wrap items-center gap-3">
-            <Link
-              href={signedIn ? "/gallery" : "/sign-up"}
-              className="rounded-lg bg-white px-5 py-3 text-sm font-medium text-ink-900 shadow-lift transition hover:bg-white/90"
-            >
-              {signedIn ? "Open the gallery" : "Get started — free"}
-            </Link>
+            <PrimaryCta
+              signedIn={signedIn}
+              allAccess={allAccess}
+              priceDisplay={priceDisplay}
+            />
             <Link
               href="/gallery"
               className="rounded-lg border border-white/15 bg-white/[0.02] px-5 py-3 text-sm font-medium text-white transition hover:bg-white/[0.06]"
@@ -48,7 +55,11 @@ export function Hero({ signedIn }: { signedIn: boolean }) {
             </Link>
           </div>
           <p data-reveal className="mt-4 text-sm text-ink-300">
-            No credit card. Templates open in their own app, in a new tab.
+            {allAccess
+              ? "Templates open in their own app, in a new tab."
+              : signedIn
+                ? "One-time payment. Lifetime access to every template."
+                : "No credit card to browse. Templates open in their own app, in a new tab."}
           </p>
         </Reveal>
 
@@ -86,5 +97,32 @@ export function Hero({ signedIn }: { signedIn: boolean }) {
         </Reveal>
       </div>
     </section>
+  );
+}
+
+function PrimaryCta({ signedIn, allAccess, priceDisplay }: Props) {
+  const buttonClass =
+    "rounded-lg bg-white px-5 py-3 text-sm font-medium text-ink-900 shadow-lift transition hover:bg-white/90";
+
+  if (!signedIn) {
+    return (
+      <Link href="/sign-up" className={buttonClass}>
+        Get started — free
+      </Link>
+    );
+  }
+  if (allAccess) {
+    return (
+      <Link href="/gallery" className={buttonClass}>
+        Open the gallery
+      </Link>
+    );
+  }
+  return (
+    <form action={startCheckout}>
+      <button type="submit" className={buttonClass}>
+        {priceDisplay ? `Get all-access — ${priceDisplay}` : "Get all-access"}
+      </button>
+    </form>
   );
 }

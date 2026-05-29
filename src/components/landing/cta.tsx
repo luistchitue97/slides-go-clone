@@ -1,7 +1,20 @@
 import Link from "next/link";
 import { Reveal } from "@/components/motion/reveal";
+import { startCheckout } from "@/lib/checkout-actions";
 
-export function LandingCta({ signedIn }: { signedIn: boolean }) {
+type Props = {
+  signedIn: boolean;
+  allAccess: boolean;
+  priceDisplay: string | null;
+};
+
+export function LandingCta({ signedIn, allAccess, priceDisplay }: Props) {
+  const headline = !signedIn
+    ? "Sign up and the gallery opens immediately."
+    : allAccess
+      ? "Pick the deck you need and open it."
+      : "One-time payment. Every template, forever.";
+
   return (
     <section className="border-t border-white/5">
       <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:py-28">
@@ -25,21 +38,19 @@ export function LandingCta({ signedIn }: { signedIn: boolean }) {
               data-reveal
               className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl"
             >
-              {signedIn
-                ? "Pick the deck you need and open it."
-                : "Sign up and the gallery opens immediately."}
+              {headline}
             </h2>
             <p data-reveal className="mt-4 text-ink-200">
-              Free to browse. Hosted, secure auth via WorkOS — no password forms, no email
-              confirmations to chase.
+              {allAccess
+                ? "Templates open in their own app, in a new tab — no import, no install."
+                : "Free to browse. Hosted, secure auth via WorkOS — no password forms, no email confirmations to chase."}
             </p>
             <div data-reveal className="mt-7 flex flex-wrap items-center gap-3">
-              <Link
-                href={signedIn ? "/gallery" : "/sign-up"}
-                className="rounded-lg bg-white px-5 py-3 text-sm font-medium text-ink-900 shadow-lift transition hover:bg-white/90"
-              >
-                {signedIn ? "Open the gallery" : "Create your account"}
-              </Link>
+              <PrimaryCta
+                signedIn={signedIn}
+                allAccess={allAccess}
+                priceDisplay={priceDisplay}
+              />
               {!signedIn ? (
                 <Link
                   href="/sign-in"
@@ -53,5 +64,32 @@ export function LandingCta({ signedIn }: { signedIn: boolean }) {
         </Reveal>
       </div>
     </section>
+  );
+}
+
+function PrimaryCta({ signedIn, allAccess, priceDisplay }: Props) {
+  const buttonClass =
+    "rounded-lg bg-white px-5 py-3 text-sm font-medium text-ink-900 shadow-lift transition hover:bg-white/90";
+
+  if (!signedIn) {
+    return (
+      <Link href="/sign-up" className={buttonClass}>
+        Create your account
+      </Link>
+    );
+  }
+  if (allAccess) {
+    return (
+      <Link href="/gallery" className={buttonClass}>
+        Open the gallery
+      </Link>
+    );
+  }
+  return (
+    <form action={startCheckout}>
+      <button type="submit" className={buttonClass}>
+        {priceDisplay ? `Get all-access — ${priceDisplay}` : "Get all-access"}
+      </button>
+    </form>
   );
 }

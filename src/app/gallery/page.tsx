@@ -1,16 +1,23 @@
+import { withAuth } from "@workos-inc/authkit-nextjs";
 import { CategoryPills } from "@/components/gallery/category-pills";
 import { GalleryControls } from "@/components/gallery/gallery-controls";
 import { EmptyState } from "@/components/gallery/empty-state";
 import { TemplateCard } from "@/components/templates/template-card";
 import { Reveal } from "@/components/motion/reveal";
 import { getTemplates, parseCategory, parseSearch, parseSort } from "@/lib/data";
+import { getEntitlements } from "@/lib/entitlements";
 
 export const metadata = {
   title: "Gallery",
   description: "Browse the full library of DeckForge business presentation templates.",
 };
 
-type SearchParams = Promise<{ category?: string; q?: string; sort?: string }>;
+type SearchParams = Promise<{
+  category?: string;
+  q?: string;
+  sort?: string;
+  already_purchased?: string;
+}>;
 
 export default async function GalleryPage({ searchParams }: { searchParams: SearchParams }) {
   const raw = await searchParams;
@@ -18,8 +25,13 @@ export default async function GalleryPage({ searchParams }: { searchParams: Sear
   const search = parseSearch(raw.q);
   const sort = parseSort(raw.sort);
 
-  const templates = await getTemplates({ category, search, sort });
+  const { user } = await withAuth({ ensureSignedIn: true });
+  const [templates, entitlements] = await Promise.all([
+    getTemplates({ category, search, sort }),
+    getEntitlements(user.id),
+  ]);
   const count = templates.length;
+  const locked = !entitlements.allAccess;
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:py-16">
@@ -40,6 +52,15 @@ export default async function GalleryPage({ searchParams }: { searchParams: Sear
         </div>
       </Reveal>
 
+      {raw.already_purchased === "1" ? (
+        <p
+          role="status"
+          className="mt-6 rounded-lg border border-emerald-400/30 bg-emerald-400/10 p-3 text-sm text-emerald-100"
+        >
+          You already have all-access — pick a template and open it.
+        </p>
+      ) : null}
+
       <div className="mt-8 space-y-5">
         <CategoryPills active={category} search={search} sort={sort} />
         <GalleryControls initialSearch={search ?? ""} sort={sort} />
@@ -51,7 +72,7 @@ export default async function GalleryPage({ searchParams }: { searchParams: Sear
         <ul className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {templates.map((t, i) => (
             <li key={t.slug}>
-              <TemplateCard template={t} priority={i < 3} />
+              <TemplateCard template={t} priority={i < 3} locked={locked} />
             </li>
           ))}
         </ul>
