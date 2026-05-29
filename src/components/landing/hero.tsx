@@ -11,35 +11,56 @@ type Props = {
 };
 
 /**
- * Decorative right-side bento. Each cell shows one of the existing
- * placeholder template SVGs at varying sizes. The container is masked
- * toward the left so the headline never fights for legibility, and the
- * overall opacity stays low enough that the section reads as background.
- * Swap any `src` for a real template screenshot when you have them.
+ * Decorative right-side bento. Each cell renders one piece of media at a
+ * varying size. The container is masked toward the left so the headline
+ * never fights for legibility, and overall opacity stays low.
+ *
+ * Each cell carries:
+ *   - `src` (required): the static poster — SVG, PNG, JPG, WebP, or GIF.
+ *     Also used as the `prefers-reduced-motion: reduce` fallback.
+ *   - `videoSrc` (optional): MP4 or WebM. When set, plays muted+looped
+ *     over the poster on motion-safe devices. Hidden when the user
+ *     prefers reduced motion (CSS-only, no JS state needed).
+ *
+ * To add motion: drop files in /public/templates/gifs/ and set videoSrc
+ * on the matching cell. Keep each file small (< 1 MB ideally) — six of
+ * them autoplay simultaneously, so bandwidth matters.
  */
-const BENTO_CELLS: Array<{ src: string; className: string }> = [
+type BentoCell = {
+  src: string;
+  videoSrc?: string;
+  className: string;
+};
+
+const BENTO_CELLS: BentoCell[] = [
   {
     src: "/templates/placeholder-north-star.svg",
+    videoSrc: "/templates/gifs/north-star.mp4",
     className: "col-span-2 row-span-2",
   },
   {
     src: "/templates/placeholder-qbr.svg",
+    // videoSrc: "/templates/gifs/qbr.mp4",
     className: "col-span-1 row-span-2",
   },
   {
     src: "/templates/placeholder-data-room.svg",
+    // videoSrc: "/templates/gifs/data-room.mp4",
     className: "col-span-1 row-span-2",
   },
   {
     src: "/templates/placeholder-revenue.svg",
+    // videoSrc: "/templates/gifs/revenue.mp4",
     className: "col-span-2 row-span-1",
   },
   {
     src: "/templates/placeholder-growth.svg",
+    // videoSrc: "/templates/gifs/growth.mp4",
     className: "col-span-1 row-span-1",
   },
   {
     src: "/templates/placeholder-fpa.svg",
+    // videoSrc: "/templates/gifs/fpa.mp4",
     className: "col-span-1 row-span-1",
   },
 ];
@@ -70,13 +91,41 @@ export function Hero({ signedIn, allAccess, priceDisplay }: Props) {
                 key={cell.src}
                 className={`relative overflow-hidden rounded-lg border border-white/15 bg-ink-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] ${cell.className}`}
               >
-                <Image
-                  src={cell.src}
-                  alt=""
-                  fill
-                  sizes="(min-width: 1280px) 220px, (min-width: 1024px) 180px, 0px"
-                  className="object-cover"
-                />
+                {cell.videoSrc ? (
+                  <>
+                    <video
+                      src={cell.videoSrc}
+                      poster={cell.src}
+                      muted
+                      loop
+                      playsInline
+                      autoPlay
+                      preload="metadata"
+                      className="absolute inset-0 size-full object-cover motion-reduce:hidden"
+                    />
+                    {/* When reduce-motion hides the <video>, this still poster
+                        keeps the cell visible. next/image optimization for the
+                        static path; the video tag's `poster` is a separate
+                        render path only used while the video is buffering. */}
+                    <Image
+                      src={cell.src}
+                      alt=""
+                      fill
+                      sizes="(min-width: 1280px) 220px, (min-width: 1024px) 180px, 0px"
+                      unoptimized={cell.src.endsWith(".gif")}
+                      className="absolute inset-0 size-full object-cover motion-safe:hidden"
+                    />
+                  </>
+                ) : (
+                  <Image
+                    src={cell.src}
+                    alt=""
+                    fill
+                    sizes="(min-width: 1280px) 220px, (min-width: 1024px) 180px, 0px"
+                    unoptimized={cell.src.endsWith(".gif")}
+                    className="object-cover"
+                  />
+                )}
                 {/* Subtle silver sheen for the metallic-grid feel. */}
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/[0.06] via-transparent to-white/[0.03]" />
               </div>
