@@ -7,15 +7,31 @@ export const metadata = { title: "Sign in" };
 
 type SearchParams = Promise<{ error?: string; returnTo?: string }>;
 
-export default async function SignInPage({ searchParams }: { searchParams: SearchParams }) {
-  const { user } = await withAuth();
-  if (user) redirect("/gallery");
+// Allow only same-org redirects post-sign-in. Without this, a crafted
+// ?returnTo=https://attacker.com would let anyone phish freshly-signed-in users.
+function safeReturnTo(returnTo?: string): string | null {
+  if (!returnTo) return null;
+  try {
+    const dest = new URL(returnTo);
+    if (dest.hostname === "luistchitue.com" || dest.hostname.endsWith(".luistchitue.com")) {
+      return dest.toString();
+    }
+  } catch {
+    if (returnTo.startsWith("/")) return returnTo;
+  }
+  return null;
+}
 
+export default async function SignInPage({ searchParams }: { searchParams: SearchParams }) {
   const { error, returnTo } = await searchParams;
+  const safe = safeReturnTo(returnTo);
+
+  const { user } = await withAuth();
+  if (user) redirect(safe ?? "/gallery");
 
   return (
     <section className="mx-auto flex max-w-md flex-col items-start gap-5 px-4 py-24 sm:px-6">
-      <span className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-wider text-ink-200">
+      <span className="text-ink-200 rounded-full border border-white/10 px-3 py-1 text-xs tracking-wider uppercase">
         Sign in
       </span>
       <h1 className="text-3xl font-semibold tracking-tight text-white">Welcome back.</h1>
@@ -35,16 +51,16 @@ export default async function SignInPage({ searchParams }: { searchParams: Searc
       ) : null}
 
       <form action={startSignIn}>
-        {returnTo ? <input type="hidden" name="returnTo" value={returnTo} /> : null}
+        {safe ? <input type="hidden" name="returnTo" value={safe} /> : null}
         <button
           type="submit"
-          className="rounded-lg bg-white px-4 py-2 text-sm font-medium text-ink-900 transition hover:bg-white/90"
+          className="text-ink-900 rounded-lg bg-white px-4 py-2 text-sm font-medium transition hover:bg-white/90"
         >
           Continue with WorkOS
         </button>
       </form>
 
-      <p className="text-sm text-ink-300">
+      <p className="text-ink-300 text-sm">
         New here?{" "}
         <Link href="/sign-up" className="text-white underline-offset-4 hover:underline">
           Create an account
