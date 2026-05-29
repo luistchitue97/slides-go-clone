@@ -1,6 +1,7 @@
 import { withAuth } from "@workos-inc/authkit-nextjs";
 import { desc, eq } from "drizzle-orm";
 import { signOutAction } from "@/lib/auth-actions";
+import { openBillingPortal } from "@/lib/billing-actions";
 import { db } from "@/db";
 import { purchases } from "@/db/schema";
 import { getEntitlements } from "@/lib/entitlements";
@@ -58,14 +59,26 @@ export default async function AccountPage({ searchParams }: { searchParams: Sear
 
       <PurchaseHistory rows={history} />
 
-      <form action={signOutAction}>
-        <button
-          type="submit"
-          className="rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/5"
-        >
-          Sign out
-        </button>
-      </form>
+      <div className="flex flex-wrap items-center gap-3">
+        {history.length > 0 ? (
+          <form action={openBillingPortal}>
+            <button
+              type="submit"
+              className="rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/5"
+            >
+              Manage billing
+            </button>
+          </form>
+        ) : null}
+        <form action={signOutAction}>
+          <button
+            type="submit"
+            className="rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/5"
+          >
+            Sign out
+          </button>
+        </form>
+      </div>
     </section>
   );
 }

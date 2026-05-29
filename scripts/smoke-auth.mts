@@ -20,6 +20,7 @@ type Check = { path: string; label: string; expect: Expect };
 
 const checks: Check[] = [
   { path: "/", label: "landing", expect: { status: 200 } },
+  { path: "/pricing", label: "pricing page", expect: { status: 200 } },
   { path: "/sign-in", label: "sign-in page", expect: { status: 200 } },
   { path: "/sign-up", label: "sign-up page", expect: { status: 200 } },
   { path: "/sitemap.xml", label: "sitemap", expect: { status: 200 } },

@@ -26,6 +26,12 @@ export async function SiteHeader() {
           >
             Gallery
           </Link>
+          <Link
+            href="/pricing"
+            className="rounded-md px-3 py-2 text-ink-200 transition hover:bg-white/5 hover:text-white"
+          >
+            Pricing
+          </Link>
 
           {user ? (
             <>
