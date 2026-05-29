@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "smoke:data": "tsx scripts/smoke-data.mts",
+    "smoke:auth": "tsx scripts/smoke-auth.mts"
   },
   "engines": {
     "node": ">=20.0.0"
@@ -33,6 +35,7 @@
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.6.0",
     "tailwindcss": "^4.0.0",
+    "tsx": "^4.22.3",
     "typescript": "^5.4.3"
   }
 }

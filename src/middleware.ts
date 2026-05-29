@@ -12,7 +12,10 @@ export default authkitMiddleware({
 });
 
 export const config = {
-  // Run on every path except Next internals and static asset files.
-  // /public assets (templates/*.svg etc.) are matched by extension below.
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|webp|gif|ico)).*)"],
+  // Run on every path except Next internals, asset files, and SEO files.
+  // /public assets (templates/*.svg etc.) and robots/sitemap are matched
+  // by extension here so they never hit the auth gate.
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.(?:svg|png|jpg|jpeg|webp|gif|ico|xml|txt)).*)",
+  ],
 };

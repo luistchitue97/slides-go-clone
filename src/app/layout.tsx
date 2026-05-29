@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,24 +19,23 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "DeckForge — Business presentation templates that don't look templated",
-    template: "%s · DeckForge",
+    default: `${SITE_NAME} — Business presentation templates that don't look templated`,
+    template: `%s · ${SITE_NAME}`,
   },
-  description:
-    "A curated library of premium business presentation templates — pitches, QBRs, sales playbooks, finance reports — ready to launch.",
-  metadataBase: new URL("http://localhost:3000"),
+  description: SITE_DESCRIPTION,
+  metadataBase: new URL(SITE_URL),
+  alternates: { canonical: "/" },
   openGraph: {
     type: "website",
-    title: "DeckForge",
-    description:
-      "A curated library of premium business presentation templates — pitches, QBRs, sales playbooks, finance reports — ready to launch.",
-    siteName: "DeckForge",
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    siteName: SITE_NAME,
+    url: SITE_URL,
   },
   twitter: {
     card: "summary_large_image",
-    title: "DeckForge",
-    description:
-      "A curated library of premium business presentation templates — pitches, QBRs, sales playbooks, finance reports — ready to launch.",
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
   },
 };
 
@@ -43,6 +43,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="flex min-h-dvh flex-col">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-ink-900 focus:shadow-lift"
+        >
+          Skip to content
+        </a>
         <SiteHeader />
         <main id="main" className="flex-1">
           {children}
