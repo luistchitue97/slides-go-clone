@@ -1,4 +1,13 @@
-import { integer, pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import {
+  integer,
+  jsonb,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
 
 /**
  * Application-side mirror of a WorkOS user. WorkOS remains the source of
@@ -34,7 +43,29 @@ export const purchases = pgTable("purchases", {
   purchasedAt: timestamp("purchased_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
+/**
+ * Per-user, per-template configuration store. Shared across all template
+ * subdomains so a customization made on one host follows the user everywhere.
+ * Composite PK (user_id, template_id) gives upsert-by-pair semantics.
+ */
+export const templateCustomizations = pgTable(
+  "template_customizations",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => appUsers.id, { onDelete: "cascade" }),
+    templateId: text("template_id").notNull(),
+    config: jsonb("config").notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.userId, t.templateId] }),
+  }),
+);
+
 export type AppUser = typeof appUsers.$inferSelect;
 export type NewAppUser = typeof appUsers.$inferInsert;
 export type Purchase = typeof purchases.$inferSelect;
 export type NewPurchase = typeof purchases.$inferInsert;
+export type TemplateCustomization = typeof templateCustomizations.$inferSelect;
+export type NewTemplateCustomization = typeof templateCustomizations.$inferInsert;
