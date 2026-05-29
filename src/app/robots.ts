@@ -9,7 +9,7 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
         // Auth-gated and high-churn routes are excluded from crawl. The
         // callback handler also has no useful content for crawlers.
-        disallow: ["/gallery", "/templates/", "/account", "/callback", "/api/"],
+        disallow: ["/templates/", "/account", "/callback", "/api/"],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,

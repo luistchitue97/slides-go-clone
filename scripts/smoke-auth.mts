@@ -25,15 +25,11 @@ const checks: Check[] = [
   { path: "/sign-up", label: "sign-up page", expect: { status: 200 } },
   { path: "/sitemap.xml", label: "sitemap", expect: { status: 200 } },
   { path: "/robots.txt", label: "robots", expect: { status: 200 } },
-  {
-    path: "/gallery",
-    label: "gallery (protected)",
-    expect: { status: 307, locationStartsWith: "https://api.workos.com/" },
-  },
+  { path: "/gallery", label: "gallery (public)", expect: { status: 200 } },
   {
     path: "/gallery?category=marketing&q=pitch",
-    label: "gallery with params (protected)",
-    expect: { status: 307, locationStartsWith: "https://api.workos.com/" },
+    label: "gallery with params (public)",
+    expect: { status: 200 },
   },
   {
     path: "/account",

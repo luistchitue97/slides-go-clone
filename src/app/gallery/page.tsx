@@ -25,13 +25,17 @@ export default async function GalleryPage({ searchParams }: { searchParams: Sear
   const search = parseSearch(raw.q);
   const sort = parseSort(raw.sort);
 
-  const { user } = await withAuth({ ensureSignedIn: true });
+  const { user } = await withAuth();
   const [templates, entitlements] = await Promise.all([
     getTemplates({ category, search, sort }),
-    getEntitlements(user.id),
+    getEntitlements(user?.id),
   ]);
   const count = templates.length;
-  const locked = !entitlements.allAccess;
+  // Anonymous visitors see no lock pill — we don't want to pressure them
+  // before they've signed up. Once signed in, the lock indicates they need
+  // to buy. Clicking a card always sends them to the detail page; if they
+  // aren't signed in, middleware redirects there.
+  const locked = Boolean(user) && !entitlements.allAccess;
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:py-16">
