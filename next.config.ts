@@ -33,7 +33,10 @@ const csp = [
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "object-src 'none'",
-  "upgrade-insecure-requests",
+  // Prod-only: in dev we serve http://local.luistchitue.com:3000 for
+  // subdomain-cookie testing, and this directive would force subresources
+  // to https and break asset loading.
+  ...(isProd ? ["upgrade-insecure-requests"] : []),
 ].join("; ");
 
 const securityHeaders = [
