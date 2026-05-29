@@ -1,6 +1,22 @@
 import { templates } from "@/data/templates";
 import { CATEGORIES, type Category, type Template } from "@/types/template";
 
+// Per-template launch URL is provided per environment via env vars named by
+// the template's order in the data array (NEXT_PUBLIC_TEMPLATE_ONE_URL …
+// NEXT_PUBLIC_TEMPLATE_NINE_URL). Keeping the mapping here means callers
+// don't have to know which slug maps to which env var.
+const ORDER_WORDS = [
+  "ONE",
+  "TWO",
+  "THREE",
+  "FOUR",
+  "FIVE",
+  "SIX",
+  "SEVEN",
+  "EIGHT",
+  "NINE",
+] as const;
+
 export type SortKey = "newest" | "alpha";
 
 export type TemplateQuery = {
@@ -29,6 +45,19 @@ export async function getTemplates(query: TemplateQuery = {}): Promise<Template[
 
 export async function getTemplate(slug: string): Promise<Template | null> {
   return templates.find((t) => t.slug === slug) ?? null;
+}
+
+/**
+ * Resolve the per-environment launch URL for a template by its order in the
+ * data array (1-based: north-star-pitch → ONE, quarterly-business-review →
+ * TWO, …). Returns null if the slug isn't recognized or its env var isn't
+ * set in the current environment.
+ */
+export function getTemplateOrderUrl(slug: string): string | null {
+  const i = templates.findIndex((t) => t.slug === slug);
+  if (i < 0 || i >= ORDER_WORDS.length) return null;
+  const url = process.env[`NEXT_PUBLIC_TEMPLATE_${ORDER_WORDS[i]}_URL`];
+  return url && url.length > 0 ? url : null;
 }
 
 export async function getFeaturedTemplates(limit = 3): Promise<Template[]> {

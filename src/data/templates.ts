@@ -1,6 +1,27 @@
 import type { Template } from "@/types/template";
 
+// Order in this array drives two things:
+//   1. The default newest-first sort on /gallery (also derivable from
+//      publishedAt — kept here for stability when dates collide).
+//   2. The per-template env-var mapping in getTemplateOrderUrl
+//      (NEXT_PUBLIC_TEMPLATE_ONE_URL → index 0, _TWO_URL → index 1, …).
+// Reordering this file shifts the env-var-to-template assignments — keep
+// .env.example in sync.
 export const templates: Template[] = [
+  {
+    slug: "series-a-data-room",
+    title: "Series A Data Room",
+    category: "investing",
+    tags: ["fundraising", "due-diligence"],
+    shortDescription: "A data-room companion deck that anticipates investor questions.",
+    longDescription:
+      "Walks LPs through traction, unit economics, and the team behind the numbers. Pairs cleanly with a Notion or DocSend room.",
+    thumbnailUrl: "/templates/placeholder-data-room.svg",
+    launchUrl: "https://example.com/templates/series-a-data-room",
+    aspectRatio: "16:9",
+    isNew: true,
+    publishedAt: "2026-05-18",
+  },
   {
     slug: "north-star-pitch",
     title: "North Star Pitch",
@@ -29,6 +50,19 @@ export const templates: Template[] = [
     publishedAt: "2026-04-22",
   },
   {
+    slug: "people-all-hands",
+    title: "People All-Hands",
+    category: "hr",
+    tags: ["all-hands", "culture", "people"],
+    shortDescription: "A warm, human all-hands template that scales from 20 to 2,000.",
+    longDescription:
+      "All-Hands is about momentum and recognition. Built-in moments for shout-outs, hires, and the metric that matters this quarter.",
+    thumbnailUrl: "/templates/placeholder-all-hands.svg",
+    launchUrl: "https://example.com/templates/people-all-hands",
+    aspectRatio: "16:9",
+    publishedAt: "2026-04-02",
+  },
+  {
     slug: "revenue-playbook",
     title: "Revenue Playbook",
     category: "sales",
@@ -42,18 +76,17 @@ export const templates: Template[] = [
     publishedAt: "2026-03-30",
   },
   {
-    slug: "series-a-data-room",
-    title: "Series A Data Room",
-    category: "investing",
-    tags: ["fundraising", "due-diligence"],
-    shortDescription: "A data-room companion deck that anticipates investor questions.",
+    slug: "growth-experiment-report",
+    title: "Growth Experiment Report",
+    category: "marketing",
+    tags: ["growth", "experiments", "analytics"],
+    shortDescription: "Report on growth experiments without burying the lede.",
     longDescription:
-      "Walks LPs through traction, unit economics, and the team behind the numbers. Pairs cleanly with a Notion or DocSend room.",
-    thumbnailUrl: "/templates/placeholder-data-room.svg",
-    launchUrl: "https://example.com/templates/series-a-data-room",
+      "Pre-built layouts for hypothesis, result, and decision. Designed so a skim reader leaves with the punchline and a careful reader leaves with the evidence.",
+    thumbnailUrl: "/templates/placeholder-growth.svg",
+    launchUrl: "https://example.com/templates/growth-experiment-report",
     aspectRatio: "16:9",
-    isNew: true,
-    publishedAt: "2026-05-18",
+    publishedAt: "2026-03-12",
   },
   {
     slug: "fp-and-a-monthly-close",
@@ -80,31 +113,5 @@ export const templates: Template[] = [
     launchUrl: "https://example.com/templates/ops-incident-review",
     aspectRatio: "16:9",
     publishedAt: "2026-01-09",
-  },
-  {
-    slug: "people-all-hands",
-    title: "People All-Hands",
-    category: "hr",
-    tags: ["all-hands", "culture", "people"],
-    shortDescription: "A warm, human all-hands template that scales from 20 to 2,000.",
-    longDescription:
-      "All-Hands is about momentum and recognition. Built-in moments for shout-outs, hires, and the metric that matters this quarter.",
-    thumbnailUrl: "/templates/placeholder-all-hands.svg",
-    launchUrl: "https://example.com/templates/people-all-hands",
-    aspectRatio: "16:9",
-    publishedAt: "2026-04-02",
-  },
-  {
-    slug: "growth-experiment-report",
-    title: "Growth Experiment Report",
-    category: "marketing",
-    tags: ["growth", "experiments", "analytics"],
-    shortDescription: "Report on growth experiments without burying the lede.",
-    longDescription:
-      "Pre-built layouts for hypothesis, result, and decision. Designed so a skim reader leaves with the punchline and a careful reader leaves with the evidence.",
-    thumbnailUrl: "/templates/placeholder-growth.svg",
-    launchUrl: "https://example.com/templates/growth-experiment-report",
-    aspectRatio: "16:9",
-    publishedAt: "2026-03-12",
   },
 ];
