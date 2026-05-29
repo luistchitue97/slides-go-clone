@@ -223,7 +223,8 @@ Target: **Vercel**.
 6. In the **Stripe dashboard**, register a webhook endpoint at `https://yourdomain.com/api/stripe/webhook` listening for `checkout.session.completed`. Copy the signing secret into Vercel's `STRIPE_WEBHOOK_SECRET`.
 7. Set `NEXT_PUBLIC_SITE_URL` to the canonical production URL.
 8. Deploy.
-9. From a local checkout pointed at the production `DATABASE_URL_UNPOOLED`, run `pnpm db:migrate` (or wire it into a Vercel build step).
+
+> **Migrations on Vercel.** `package.json` defines a `vercel-build` script (`pnpm db:migrate && next build`) that Vercel auto-detects. Every deploy applies any pending Drizzle migrations against the matching Neon branch before building the app, and Drizzle's `__drizzle_migrations` tracker makes already-applied migrations a no-op — so re-deploys never re-run old migrations and never wipe data. Local `pnpm build` is unchanged.
 
 ## Build phases
 
