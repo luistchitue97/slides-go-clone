@@ -20,6 +20,10 @@ export const runtime = "nodejs";
 // Stripe sends the raw body; ensure Next never caches a response.
 export const dynamic = "force-dynamic";
 
+// Allowlist of values we accept in session.metadata.kind. Extend here when
+// adding per-template purchases (e.g. /^template:[a-z0-9-]+$/ matchers).
+const KNOWN_PURCHASE_KINDS = new Set(["all_access"]);
+
 export async function POST(request: NextRequest) {
   const signature = request.headers.get("stripe-signature");
   if (!signature) {
@@ -81,7 +85,19 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     throw new Error(`Checkout session ${session.id} has no customer email`);
   }
 
-  const kind = (session.metadata?.kind ?? "all_access").toString();
+  // Kind allowlist — defense in depth. Even with a valid signature, we
+  // refuse to write an unknown kind into purchases (would otherwise let
+  // a leaked webhook secret or an attacker who tricks our checkout flow
+  // into using a junk metadata value pollute the table).
+  const rawKind = (session.metadata?.kind ?? "all_access").toString();
+  if (!KNOWN_PURCHASE_KINDS.has(rawKind)) {
+    console.warn(
+      `[stripe/webhook] unknown kind="${rawKind}" on session ${session.id}; ignoring`,
+    );
+    return;
+  }
+  const kind = rawKind;
+
   const amountCents = session.amount_total ?? 0;
   const currency = (session.currency ?? "usd").toLowerCase();
 

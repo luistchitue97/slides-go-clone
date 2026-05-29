@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const isProd = process.env.NODE_ENV === "production";
 
 /**
- * Pragmatic CSP for a Next.js + WorkOS AuthKit app.
+ * Pragmatic CSP for a Next.js + WorkOS AuthKit + Stripe (Hosted Checkout) app.
  *
  * - 'unsafe-inline' is required for Next's hydration bootstrap script and for
  *   styled spans Next inlines for streaming. A nonce-based approach is the
@@ -13,6 +13,13 @@ const isProd = process.env.NODE_ENV === "production";
  * - form-action allows api.workos.com so the sign-in / sign-up server
  *   actions, which redirect to the WorkOS hosted URL, are permitted.
  * - frame-ancestors 'none' prevents click-jacking. Equivalent to X-Frame-Options: DENY.
+ *
+ * Stripe — Hosted Checkout is a top-level redirect, not an embed or fetch,
+ * so no CSP allowance is needed today. If you ever embed Stripe.js
+ * (Elements, payment-method update, etc.) add the following:
+ *   script-src  + https://js.stripe.com
+ *   frame-src   + https://js.stripe.com https://hooks.stripe.com
+ *   connect-src + https://api.stripe.com
  */
 const csp = [
   "default-src 'self'",
