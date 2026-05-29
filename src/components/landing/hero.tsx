@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Reveal } from "@/components/motion/reveal";
 import { startCheckout } from "@/lib/checkout-actions";
 
@@ -8,6 +9,40 @@ type Props = {
   /** Pre-formatted price string from getAllAccessPrice, or null on misconfig. */
   priceDisplay: string | null;
 };
+
+/**
+ * Decorative right-side bento. Each cell shows one of the existing
+ * placeholder template SVGs at varying sizes. The container is masked
+ * toward the left so the headline never fights for legibility, and the
+ * overall opacity stays low enough that the section reads as background.
+ * Swap any `src` for a real template screenshot when you have them.
+ */
+const BENTO_CELLS: Array<{ src: string; className: string }> = [
+  {
+    src: "/templates/placeholder-north-star.svg",
+    className: "col-span-2 row-span-2",
+  },
+  {
+    src: "/templates/placeholder-qbr.svg",
+    className: "col-span-1 row-span-2",
+  },
+  {
+    src: "/templates/placeholder-data-room.svg",
+    className: "col-span-1 row-span-2",
+  },
+  {
+    src: "/templates/placeholder-revenue.svg",
+    className: "col-span-2 row-span-1",
+  },
+  {
+    src: "/templates/placeholder-growth.svg",
+    className: "col-span-1 row-span-1",
+  },
+  {
+    src: "/templates/placeholder-fpa.svg",
+    className: "col-span-1 row-span-1",
+  },
+];
 
 export function Hero({ signedIn, allAccess, priceDisplay }: Props) {
   return (
@@ -19,6 +54,35 @@ export function Hero({ signedIn, allAccess, priceDisplay }: Props) {
       >
         <div className="absolute left-1/2 top-0 size-[640px] -translate-x-1/2 rounded-full bg-brand-600/30 blur-3xl" />
         <div className="absolute right-0 top-32 size-[320px] rounded-full bg-accent-500/20 blur-3xl" />
+      </div>
+
+      {/* Bento wall of template cards — sits behind the text on lg+ screens,
+          fades out toward the left via a mask gradient so the headline stays
+          readable. Hidden entirely below lg where the layout would clash. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 right-0 hidden w-[58%] xl:w-[55%] lg:block"
+      >
+        <div className="absolute inset-0 opacity-[0.22] [mask-image:linear-gradient(to_right,transparent,black_35%,black)]">
+          <div className="grid h-full w-full grid-cols-4 grid-rows-3 gap-2 p-4 sm:gap-3 sm:p-6">
+            {BENTO_CELLS.map((cell) => (
+              <div
+                key={cell.src}
+                className={`relative overflow-hidden rounded-lg border border-white/15 bg-ink-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] ${cell.className}`}
+              >
+                <Image
+                  src={cell.src}
+                  alt=""
+                  fill
+                  sizes="(min-width: 1280px) 220px, (min-width: 1024px) 180px, 0px"
+                  className="object-cover"
+                />
+                {/* Subtle silver sheen for the metallic-grid feel. */}
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/[0.06] via-transparent to-white/[0.03]" />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       <div className="relative mx-auto max-w-6xl px-4 pb-24 pt-24 sm:px-6 sm:pt-28 lg:pt-32">
