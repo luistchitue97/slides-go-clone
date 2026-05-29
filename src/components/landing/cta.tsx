@@ -43,7 +43,7 @@ export function LandingCta({ signedIn, allAccess, priceDisplay }: Props) {
             <p data-reveal className="mt-4 text-ink-200">
               {allAccess
                 ? "Templates open in their own app, in a new tab — no import, no install."
-                : "Free to browse. Hosted, secure auth via WorkOS — no password forms, no email confirmations to chase."}
+                : "Free to browse. One-time payment, 30-day money-back guarantee. Secure checkout via Stripe."}
             </p>
             <div data-reveal className="mt-7 flex flex-wrap items-center gap-3">
               <PrimaryCta

@@ -58,8 +58,8 @@ export function Hero({ signedIn, allAccess, priceDisplay }: Props) {
             {allAccess
               ? "Templates open in their own app, in a new tab."
               : signedIn
-                ? "One-time payment. Lifetime access to every template."
-                : "No credit card to browse. Templates open in their own app, in a new tab."}
+                ? "One-time payment. Lifetime access. 30-day money-back guarantee."
+                : "Free to browse. 30-day money-back guarantee on all-access."}
           </p>
         </Reveal>
 
