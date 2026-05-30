@@ -24,6 +24,14 @@ export const dynamic = "force-dynamic";
 // adding per-template purchases (e.g. /^template:[a-z0-9-]+$/ matchers).
 const KNOWN_PURCHASE_KINDS = new Set(["all_access"]);
 
+// Stripe sets "paid" for normal charges and "no_payment_required" when a
+// 100%-off promotion code (e.g. a friends-and-family comp) zeros the total.
+// Both should grant access; everything else (async payments, failures) shouldn't.
+const FULFILLABLE_PAYMENT_STATUSES = new Set<Stripe.Checkout.Session["payment_status"]>([
+  "paid",
+  "no_payment_required",
+]);
+
 export async function POST(request: NextRequest) {
   const signature = request.headers.get("stripe-signature");
   if (!signature) {
@@ -62,11 +70,12 @@ export async function POST(request: NextRequest) {
 }
 
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
-  // The Checkout Session is only considered paid once payment_status is "paid".
-  // Sessions for asynchronous payment methods (e.g. bank debits) can complete
-  // and *then* fail later — we'd handle those in checkout.session.async_payment_*
-  // when/if we accept those rails.
-  if (session.payment_status !== "paid") {
+  // Grant only when the session is fully settled: a normal "paid" charge or a
+  // promo-code-discounted session that doesn't require payment at all.
+  // Async payment methods (bank debits) can complete and *then* fail later
+  // — we'd handle those in checkout.session.async_payment_* when/if we accept
+  // those rails.
+  if (!FULFILLABLE_PAYMENT_STATUSES.has(session.payment_status)) {
     console.warn(
       `[stripe/webhook] checkout.session.completed with payment_status=${session.payment_status}; ignoring`,
     );
