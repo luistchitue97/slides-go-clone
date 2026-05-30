@@ -113,7 +113,7 @@ export default async function PricingPage() {
                 DeckForge All-Access
               </p>
               {allAccess ? (
-                <div className="flex items-baseline gap-3">
+                <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                   <span className="inline-flex items-center gap-2 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
                     <CheckIcon className="size-7 text-emerald-300" />
                     Active
@@ -121,8 +121,8 @@ export default async function PricingPage() {
                   <span className="text-sm text-ink-300">lifetime access</span>
                 </div>
               ) : (
-                <div className="flex items-baseline gap-2">
-                  <span className="text-5xl font-semibold tracking-tight text-white">
+                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                  <span className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">
                     {price?.display ?? "—"}
                   </span>
                   <span className="text-sm text-ink-300">one-time · lifetime access</span>

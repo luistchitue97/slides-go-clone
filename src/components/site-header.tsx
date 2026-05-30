@@ -19,55 +19,101 @@ export async function SiteHeader() {
           />
           DeckForge
         </Link>
-        <nav className="flex items-center gap-1 text-sm" aria-label="Primary">
-          <Link
-            href="/gallery"
-            className="rounded-md px-3 py-2 text-ink-200 transition hover:bg-white/5 hover:text-white"
-          >
-            Gallery
-          </Link>
-          <Link
-            href="/pricing"
-            className="rounded-md px-3 py-2 text-ink-200 transition hover:bg-white/5 hover:text-white"
-          >
-            Pricing
-          </Link>
 
-          {user ? (
-            <>
-              <Link
-                href="/account"
-                className="rounded-md px-3 py-2 text-ink-200 transition hover:bg-white/5 hover:text-white"
-              >
-                Account
-              </Link>
-              <form action={signOutAction}>
-                <button
-                  type="submit"
-                  className="rounded-md px-3 py-2 text-ink-200 transition hover:bg-white/5 hover:text-white"
-                >
-                  Sign out
-                </button>
-              </form>
-            </>
-          ) : (
-            <>
-              <Link
-                href="/sign-in"
-                className="rounded-md px-3 py-2 text-ink-200 transition hover:bg-white/5 hover:text-white"
-              >
-                Sign in
-              </Link>
-              <Link
-                href="/sign-up"
-                className="rounded-md bg-white px-3 py-2 font-medium text-ink-900 transition hover:bg-white/90"
-              >
-                Get started
-              </Link>
-            </>
-          )}
+        {/* Inline nav (≥ md). Below md the same links live in the dropdown. */}
+        <nav className="hidden items-center gap-1 text-sm md:flex" aria-label="Primary">
+          <NavLinks signedIn={Boolean(user)} variant="inline" />
         </nav>
+
+        {/* Mobile menu — pure CSS via <details>; no client JS needed.
+            Opens an absolutely-positioned panel below the header bar. */}
+        <details className="relative md:hidden [&[open]_.menu-panel]:flex [&[open]_.menu-open-icon]:hidden [&[open]_.menu-close-icon]:block">
+          <summary
+            className="flex size-10 cursor-pointer list-none items-center justify-center rounded-md text-white transition hover:bg-white/5 [&::-webkit-details-marker]:hidden"
+            aria-label="Open menu"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              className="menu-open-icon size-5"
+              aria-hidden
+            >
+              <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" />
+            </svg>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              className="menu-close-icon hidden size-5"
+              aria-hidden
+            >
+              <path d="M6 6l12 12M6 18L18 6" strokeLinecap="round" />
+            </svg>
+          </summary>
+          <div className="menu-panel absolute right-0 top-full mt-2 hidden w-56 flex-col gap-1 rounded-xl border border-white/10 bg-ink-900/95 p-2 text-sm shadow-lift backdrop-blur">
+            <NavLinks signedIn={Boolean(user)} variant="dropdown" />
+          </div>
+        </details>
       </div>
     </header>
+  );
+}
+
+function NavLinks({
+  signedIn,
+  variant,
+}: {
+  signedIn: boolean;
+  variant: "inline" | "dropdown";
+}) {
+  const linkClass =
+    variant === "inline"
+      ? "rounded-md px-3 py-2 text-ink-200 transition hover:bg-white/5 hover:text-white"
+      : "block rounded-md px-3 py-2 text-ink-100 transition hover:bg-white/5 hover:text-white";
+  const ctaClass =
+    variant === "inline"
+      ? "rounded-md bg-white px-3 py-2 font-medium text-ink-900 transition hover:bg-white/90"
+      : "block rounded-md bg-white px-3 py-2 text-center font-medium text-ink-900 transition hover:bg-white/90";
+  // Dropdown buttons need to span the full panel width so they look like the
+  // other links. Inline buttons keep their natural width.
+  const buttonClass =
+    variant === "inline"
+      ? "rounded-md px-3 py-2 text-ink-200 transition hover:bg-white/5 hover:text-white"
+      : "block w-full rounded-md px-3 py-2 text-left text-ink-100 transition hover:bg-white/5 hover:text-white";
+
+  return (
+    <>
+      <Link href="/gallery" className={linkClass}>
+        Gallery
+      </Link>
+      <Link href="/pricing" className={linkClass}>
+        Pricing
+      </Link>
+
+      {signedIn ? (
+        <>
+          <Link href="/account" className={linkClass}>
+            Account
+          </Link>
+          <form action={signOutAction}>
+            <button type="submit" className={buttonClass}>
+              Sign out
+            </button>
+          </form>
+        </>
+      ) : (
+        <>
+          <Link href="/sign-in" className={linkClass}>
+            Sign in
+          </Link>
+          <Link href="/sign-up" className={ctaClass}>
+            Get started
+          </Link>
+        </>
+      )}
+    </>
   );
 }
