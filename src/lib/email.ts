@@ -47,17 +47,19 @@ export async function sendPurchaseWelcomeEmail({ to }: { to: string }): Promise<
     // Resend dashboard) instead of the no-reply sender domain.
     replyTo: SUPPORT_EMAIL,
     subject: "Welcome to DeckForge — your all-access is active",
-    html: buildWelcomeHtml({ galleryUrl, accountUrl }),
-    text: buildWelcomeText({ galleryUrl, accountUrl }),
+    html: buildWelcomeHtml({ galleryUrl, accountUrl, supportEmail: SUPPORT_EMAIL }),
+    text: buildWelcomeText({ galleryUrl, accountUrl, supportEmail: SUPPORT_EMAIL }),
   });
 }
 
 function buildWelcomeHtml({
   galleryUrl,
   accountUrl,
+  supportEmail,
 }: {
   galleryUrl: string;
   accountUrl: string;
+  supportEmail: string;
 }): string {
   // Inline styles only — most email clients strip <style> blocks. Keep the
   // design simple; the brand can carry it without ornate layout.
@@ -93,7 +95,7 @@ function buildWelcomeHtml({
                 </ul>
 
                 <p style="margin:24px 0 0;font-size:14px;line-height:1.6;color:#d1d5db;">
-                  Manage your purchase or invoices on your <a href="${accountUrl}" style="color:#ffffff;text-decoration:underline;">account page</a>. Questions, requests, or a template you wish existed? Just reply to this email.
+                  Manage your purchase or invoices on your <a href="${accountUrl}" style="color:#ffffff;text-decoration:underline;">account page</a>. Questions, requests, or a template you wish existed? Write to <a href="mailto:${supportEmail}" style="color:#ffffff;text-decoration:underline;">${supportEmail}</a>.
                 </p>
               </td>
             </tr>
@@ -109,9 +111,11 @@ function buildWelcomeHtml({
 function buildWelcomeText({
   galleryUrl,
   accountUrl,
+  supportEmail,
 }: {
   galleryUrl: string;
   accountUrl: string;
+  supportEmail: string;
 }): string {
   return `You're in. Welcome aboard.
 
@@ -127,7 +131,7 @@ Getting the most out of DeckForge:
 
 Manage your purchase or invoices on your account page: ${accountUrl}
 
-Questions, requests, or a template you wish existed? Just reply to this email.
+Questions, requests, or a template you wish existed? Write to ${supportEmail}.
 
 — DeckForge
 `;
