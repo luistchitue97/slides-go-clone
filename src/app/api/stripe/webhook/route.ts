@@ -3,6 +3,7 @@ import type Stripe from "stripe";
 import { getStripe, getWebhookSecret } from "@/lib/stripe";
 import { db } from "@/db";
 import { appUsers, purchases } from "@/db/schema";
+import { sendPurchaseWelcomeEmail } from "@/lib/email";
 
 /**
  * Stripe → DeckForge webhook.
@@ -119,7 +120,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     .onConflictDoUpdate({ target: appUsers.id, set: { email } });
 
   // Idempotent on session id: a duplicate webhook delivery becomes a no-op.
-  await db
+  // .returning() lets us tell first-write from no-op so the welcome email
+  // only fires once per purchase even if Stripe retries the delivery.
+  const inserted = await db
     .insert(purchases)
     .values({
       userId: workosUserId,
@@ -128,5 +131,17 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       amountCents,
       currency,
     })
-    .onConflictDoNothing({ target: purchases.stripeSessionId });
+    .onConflictDoNothing({ target: purchases.stripeSessionId })
+    .returning({ id: purchases.id });
+
+  if (inserted.length > 0) {
+    // Email failures must not 500 the webhook (Stripe would retry, the insert
+    // would no-op, but no email would ever go out since this branch is skipped
+    // on retries). Log + swallow.
+    try {
+      await sendPurchaseWelcomeEmail({ to: email });
+    } catch (err) {
+      console.error(`[stripe/webhook] welcome email failed for session ${session.id}:`, err);
+    }
+  }
 }
