@@ -1,5 +1,5 @@
 import { Resend } from "resend";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, SUPPORT_EMAIL } from "@/lib/site";
 
 /**
  * Lazy Resend client. Constructed on first call so this module is safe to
@@ -43,6 +43,9 @@ export async function sendPurchaseWelcomeEmail({ to }: { to: string }): Promise<
   await getResend().emails.send({
     from: getFromAddress(),
     to,
+    // Replies go to the support inbox (received via Resend, read in the
+    // Resend dashboard) instead of the no-reply sender domain.
+    replyTo: SUPPORT_EMAIL,
     subject: "Welcome to DeckForge — your all-access is active",
     html: buildWelcomeHtml({ galleryUrl, accountUrl }),
     text: buildWelcomeText({ galleryUrl, accountUrl }),
