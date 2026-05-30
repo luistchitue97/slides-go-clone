@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:https": "next dev --experimental-https --experimental-https-key ./local.luistchitue.com+3-key.pem --experimental-https-cert ./local.luistchitue.com+3.pem",
     "build": "next build",
     "vercel-build": "pnpm db:migrate && next build",
     "start": "next start",
