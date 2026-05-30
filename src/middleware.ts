@@ -16,6 +16,6 @@ export const config = {
   // /api/stripe/* (webhooks must reach their handler with the raw body and
   // their own signature verification — no session refresh in the middle).
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|api/stripe|.*\\.(?:svg|png|jpg|jpeg|webp|gif|ico|xml|txt)).*)",
+    "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|api/stripe|.*\\.(?:svg|png|jpg|jpeg|webp|avif|gif|ico|xml|txt|mp4|webm|mov|m4v|woff|woff2)).*)",
   ],
 };
