@@ -7,9 +7,17 @@ export async function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-white/5 bg-[var(--bg)]/80 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="flex items-center text-white" aria-label="DeckForge home">
-          <img src="/logo.svg" alt="DeckForge" className="inline-block size-14" />
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
+        <Link
+          href="/"
+          className="flex items-center gap-2 font-semibold tracking-tight text-white"
+          aria-label="DeckForge home"
+        >
+          <span
+            aria-hidden
+            className="inline-block size-6 rounded-md bg-gradient-to-br from-brand-400 to-accent-500"
+          />
+          DeckForge
         </Link>
 
         {/* Inline nav (≥ md). Below md the same links live in the dropdown. */}
