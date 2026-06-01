@@ -40,7 +40,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Sear
         </p>
       ) : null}
 
-      <dl className="grid grid-cols-1 gap-4 rounded-xl border border-white/10 bg-white/[0.02] p-5 text-sm sm:grid-cols-2">
+      <dl className="grid grid-cols-1 gap-4 rounded-xl border border-white/10 bg-gradient-to-br from-brand-700/25 via-ink-900 to-ink-900 p-5 text-sm shadow-lift sm:grid-cols-2">
         <div>
           <dt className="text-ink-300">User ID</dt>
           <dd className="mt-1 font-mono text-ink-100 break-all">{user.id}</dd>
@@ -115,14 +115,14 @@ function PurchaseHistory({
 }) {
   if (rows.length === 0) {
     return (
-      <section className="rounded-xl border border-dashed border-white/10 bg-white/[0.02] p-5 text-sm text-ink-300">
+      <section className="rounded-xl border border-dashed border-white/10 bg-gradient-to-br from-brand-700/25 via-ink-900 to-ink-900 p-5 text-sm text-ink-300 shadow-lift">
         <h2 className="text-base font-medium text-white">Purchases</h2>
         <p className="mt-1">No purchases yet.</p>
       </section>
     );
   }
   return (
-    <section className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
+    <section className="rounded-xl border border-white/10 bg-gradient-to-br from-brand-700/25 via-ink-900 to-ink-900 p-5 shadow-lift">
       <h2 className="text-base font-medium text-white">Purchases</h2>
       <ul className="mt-3 divide-y divide-white/5 text-sm">
         {rows.map((row) => (

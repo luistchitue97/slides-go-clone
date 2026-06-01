@@ -4,7 +4,7 @@ import { GalleryControls } from "@/components/gallery/gallery-controls";
 import { EmptyState } from "@/components/gallery/empty-state";
 import { TemplateCard } from "@/components/templates/template-card";
 import { Reveal } from "@/components/motion/reveal";
-import { getTemplates, parseCategory, parseSearch, parseSort } from "@/lib/data";
+import { getTemplates, getTemplateOrderUrl, parseCategory, parseSearch, parseSort } from "@/lib/data";
 import { getEntitlements } from "@/lib/entitlements";
 
 export const metadata = {
@@ -76,7 +76,12 @@ export default async function GalleryPage({ searchParams }: { searchParams: Sear
         <ul className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {templates.map((t, i) => (
             <li key={t.slug}>
-              <TemplateCard template={t} priority={i < 3} locked={locked} />
+              <TemplateCard
+                template={t}
+                priority={i < 3}
+                locked={locked}
+                launchUrl={getTemplateOrderUrl(t.slug)}
+              />
             </li>
           ))}
         </ul>

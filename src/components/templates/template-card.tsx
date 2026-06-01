@@ -12,14 +12,22 @@ type Props = {
    * can read the detail page and decide to buy.
    */
   locked?: boolean;
+  /**
+   * When provided, the card links directly to this URL (opens in a new tab)
+   * instead of the internal /templates/<slug> detail page.
+   */
+  launchUrl?: string | null;
 };
 
-export function TemplateCard({ template, priority = false, locked = false }: Props) {
+export function TemplateCard({ template, priority = false, locked = false, launchUrl }: Props) {
+  const isExternal = Boolean(launchUrl);
+  const href = launchUrl ?? `/templates/${template.slug}`;
   return (
     <Link
-      href={`/templates/${template.slug}`}
+      href={href}
+      {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
       className="group flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-ink-900 shadow-soft transition hover:-translate-y-0.5 hover:border-white/20 hover:bg-ink-800 hover:shadow-lift focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
-      aria-label={`${template.title} — ${CATEGORY_LABELS[template.category]}${locked ? " (locked)" : ""}`}
+      aria-label={`${template.title} — ${CATEGORY_LABELS[template.category]}${locked ? " (locked)" : ""}${isExternal ? " (opens in new tab)" : ""}`}
     >
       <div className="relative aspect-[16/9] overflow-hidden bg-ink-800">
         <CardMedia
