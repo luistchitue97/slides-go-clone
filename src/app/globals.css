@@ -62,9 +62,13 @@
   --border: color-mix(in oklab, var(--color-ink-100) 12%, transparent);
 }
 
+html {
+  /* Fallback colour shown before the PageBackground canvas hydrates. */
+  background-color: #030d1e;
+}
+
 html,
 body {
-  background-color: var(--bg);
   color: var(--fg);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -72,6 +76,8 @@ body {
 }
 
 body {
+  /* Transparent so the fixed PageBackground canvas shows through all sections. */
+  background-color: transparent;
   min-height: 100dvh;
 }
 
@@ -99,3 +105,6 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* Hero fluid background is rendered entirely on a <canvas> element.
+   See src/components/landing/hero-pattern.tsx. No CSS rules needed here. */
