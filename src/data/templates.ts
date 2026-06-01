@@ -44,7 +44,7 @@ export const templates: Template[] = [
     shortDescription: "Executive QBR deck with KPI dashboards and a tight narrative arc.",
     longDescription:
       "Every section in QBR has a job: context, scorecard, wins, losses, asks. Tables and charts are pre-styled to your tokens, so updating the numbers never breaks the look.",
-    thumbnailUrl: "/templates/placeholder-qbr.svg",
+    thumbnailUrl: "/templates/template-03.png",
     launchUrl: "https://example.com/templates/quarterly-business-review",
     aspectRatio: "16:9",
     publishedAt: "2026-04-22",
