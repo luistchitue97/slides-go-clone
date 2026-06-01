@@ -20,7 +20,7 @@ const props = [
 
 export function ValueProps() {
   return (
-    <section className="border-t border-white/5 bg-ink-900/40">
+    <section className="border-t border-white/5 bg-ink-900/90">
       <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:py-24">
         <Reveal as="div" className="max-w-2xl" stagger>
           <p
@@ -46,7 +46,7 @@ export function ValueProps() {
             <li
               key={p.eyebrow}
               data-reveal
-              className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 transition hover:bg-white/[0.04]"
+              className="rounded-2xl border border-white/10 bg-ink-900 p-6 transition hover:bg-ink-800"
             >
               <p className="text-xs font-medium uppercase tracking-wider text-brand-300">
                 {p.eyebrow}

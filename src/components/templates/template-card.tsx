@@ -18,7 +18,7 @@ export function TemplateCard({ template, priority = false, locked = false }: Pro
   return (
     <Link
       href={`/templates/${template.slug}`}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] shadow-soft transition hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/[0.04] hover:shadow-lift focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
+      className="group flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-ink-900 shadow-soft transition hover:-translate-y-0.5 hover:border-white/20 hover:bg-ink-800 hover:shadow-lift focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
       aria-label={`${template.title} — ${CATEGORY_LABELS[template.category]}${locked ? " (locked)" : ""}`}
     >
       <div className="relative aspect-[16/9] overflow-hidden bg-ink-800">
