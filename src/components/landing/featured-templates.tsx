@@ -1,7 +1,17 @@
 import Link from "next/link";
-import { getFeaturedTemplates } from "@/lib/data";
+import { getFeaturedTemplates, getTemplateOrderUrl } from "@/lib/data";
 import { TemplateCard } from "@/components/templates/template-card";
+import { SeriesACover } from "@/components/templates/series-a-cover";
+import { NorthStarCover } from "@/components/templates/north-star-cover";
+import { QbrCover } from "@/components/templates/qbr-cover";
 import { Reveal } from "@/components/motion/reveal";
+
+function customMediaFor(slug: string) {
+  if (slug === "series-a-data-room")        return <SeriesACover />;
+  if (slug === "north-star-pitch")          return <NorthStarCover />;
+  if (slug === "quarterly-business-review") return <QbrCover />;
+  return undefined;
+}
 
 type Props = {
   signedIn: boolean;
@@ -49,7 +59,13 @@ export async function FeaturedTemplates({ signedIn, allAccess }: Props) {
         >
           {templates.map((t, i) => (
             <li key={t.slug} data-reveal>
-              <TemplateCard template={t} priority={i === 0} locked={locked} />
+              <TemplateCard
+                template={t}
+                priority={i === 0}
+                locked={locked}
+                launchUrl={getTemplateOrderUrl(t.slug)}
+                customMedia={customMediaFor(t.slug)}
+              />
             </li>
           ))}
         </Reveal>
