@@ -30,7 +30,8 @@ export default async function SignInPage({ searchParams }: { searchParams: Searc
   if (user) redirect(safe ?? "/gallery");
 
   return (
-    <section className="mx-auto flex max-w-md flex-col items-start gap-5 px-4 py-24 sm:px-6">
+    <section className="flex min-h-[calc(100dvh-3.5rem)] items-center justify-center px-4 sm:px-6">
+      <div className="flex w-full max-w-md flex-col items-start gap-5">
       <span className="text-ink-200 rounded-full border border-white/10 px-3 py-1 text-xs tracking-wider uppercase">
         Sign in
       </span>
@@ -66,6 +67,7 @@ export default async function SignInPage({ searchParams }: { searchParams: Searc
           Create an account
         </Link>
       </p>
+      </div>
     </section>
   );
 }

@@ -2,7 +2,8 @@ import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <section className="mx-auto flex max-w-md flex-col items-start gap-4 px-4 py-24 sm:px-6">
+    <section className="flex min-h-[calc(100dvh-3.5rem)] items-center justify-center px-4 sm:px-6">
+      <div className="flex w-full max-w-md flex-col items-start gap-4">
       <span className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-wider text-ink-200">
         404
       </span>
@@ -16,6 +17,7 @@ export default function NotFound() {
       >
         Back to home
       </Link>
+      </div>
     </section>
   );
 }
