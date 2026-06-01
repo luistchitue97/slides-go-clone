@@ -5,6 +5,7 @@ import { EmptyState } from "@/components/gallery/empty-state";
 import { TemplateCard } from "@/components/templates/template-card";
 import { Reveal } from "@/components/motion/reveal";
 import { getTemplates, getTemplateOrderUrl, parseCategory, parseSearch, parseSort } from "@/lib/data";
+import { PeopleAllHandsCover } from "@/components/templates/people-all-hands-cover";
 import { getEntitlements } from "@/lib/entitlements";
 
 export const metadata = {
@@ -81,6 +82,7 @@ export default async function GalleryPage({ searchParams }: { searchParams: Sear
                 priority={i < 3}
                 locked={locked}
                 launchUrl={getTemplateOrderUrl(t.slug)}
+                customMedia={t.slug === "people-all-hands" ? <PeopleAllHandsCover /> : undefined}
               />
             </li>
           ))}

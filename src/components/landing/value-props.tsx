@@ -20,7 +20,7 @@ const props = [
 
 export function ValueProps() {
   return (
-    <section className="border-t border-white/5 bg-ink-900/90">
+    <section className="border-t border-white/5 bg-ink-900/85">
       <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:py-24">
         <Reveal as="div" className="max-w-2xl" stagger>
           <p
