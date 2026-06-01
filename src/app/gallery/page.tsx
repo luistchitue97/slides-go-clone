@@ -6,6 +6,17 @@ import { TemplateCard } from "@/components/templates/template-card";
 import { Reveal } from "@/components/motion/reveal";
 import { getTemplates, getTemplateOrderUrl, parseCategory, parseSearch, parseSort } from "@/lib/data";
 import { PeopleAllHandsCover } from "@/components/templates/people-all-hands-cover";
+import { SeriesACover } from "@/components/templates/series-a-cover";
+import { NorthStarCover } from "@/components/templates/north-star-cover";
+import { QbrCover } from "@/components/templates/qbr-cover";
+import { ComingSoonCover } from "@/components/templates/coming-soon-cover";
+
+const COMING_SOON_SLUGS = new Set([
+  "revenue-playbook",
+  "growth-experiment-report",
+  "fp-and-a-monthly-close",
+  "ops-incident-review",
+]);
 import { getEntitlements } from "@/lib/entitlements";
 
 export const metadata = {
@@ -82,7 +93,14 @@ export default async function GalleryPage({ searchParams }: { searchParams: Sear
                 priority={i < 3}
                 locked={locked}
                 launchUrl={getTemplateOrderUrl(t.slug)}
-                customMedia={t.slug === "people-all-hands" ? <PeopleAllHandsCover /> : undefined}
+                customMedia={
+                  COMING_SOON_SLUGS.has(t.slug)           ? <ComingSoonCover /> :
+                  t.slug === "people-all-hands"            ? <PeopleAllHandsCover /> :
+                  t.slug === "series-a-data-room"          ? <SeriesACover /> :
+                  t.slug === "north-star-pitch"            ? <NorthStarCover /> :
+                  t.slug === "quarterly-business-review"   ? <QbrCover /> :
+                  undefined
+                }
               />
             </li>
           ))}
