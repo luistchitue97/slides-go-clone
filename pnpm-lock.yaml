@@ -32,6 +32,9 @@ dependencies:
   resend:
     specifier: ^6.12.4
     version: 6.12.4
+  simple-icons:
+    specifier: ^16.22.0
+    version: 16.22.0
   stripe:
     specifier: ^22.2.0
     version: 22.2.0(@types/node@20.19.27)
@@ -4337,6 +4340,11 @@ packages:
       side-channel-map: 1.0.1
       side-channel-weakmap: 1.0.2
     dev: true
+
+  /simple-icons@16.22.0:
+    resolution: {integrity: sha512-/raPcEWh89R2O2IMmHum6W2dF99NNX3yWikVXKUalkDIWz3Rw/S2S+oDPTgJcIGsRh+25m0y8vj4aBaV/KPz3Q==}
+    engines: {node: '>=0.12.18'}
+    dev: false
 
   /source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
