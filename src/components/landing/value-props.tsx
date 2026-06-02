@@ -2,19 +2,19 @@ import { Reveal } from "@/components/motion/reveal";
 
 const props = [
   {
-    eyebrow: "Curated, not generated",
-    title: "Decks built by people who present for a living.",
-    body: "Every template solves a specific business problem — pitches, QBRs, monthly close, postmortems. No fillers, no lorem ipsum.",
+    eyebrow: "Live data integrations",
+    title: "Connect the tools your company already uses.",
+    body: "Stripe, HubSpot, Notion, Slack, Linear, and more — your data flows in automatically. No manual exports, no copy-paste metrics before every meeting.",
   },
   {
-    eyebrow: "Premium by default",
-    title: "Confident typography, restrained motion, real layouts.",
-    body: "Tokens for color, type, and spacing keep every slide on-brand. The design holds up on a 13\" laptop and a boardroom projector.",
+    eyebrow: "Auto-generated narratives",
+    title: "Executive-ready decks from your live operational data.",
+    body: "Revenue metrics, pipeline updates, operational insights — synthesised into structured presentations with executive-level storytelling, built for the room you're walking into.",
   },
   {
-    eyebrow: "One click to open",
-    title: "Templates are full apps. We just hand you the keys.",
-    body: "Each template is deployed as its own Next.js app. Click Open and you're editing — no import, no install, no migration.",
+    eyebrow: "Cinematic and fully editable",
+    title: "Web-native presentations your team can still customise.",
+    body: "Built with GSAP for fluid motion and pixel-perfect layouts. Every generated slide stays fully editable — rearrange, rewrite, refine without touching code.",
   },
 ];
 
@@ -27,13 +27,13 @@ export function ValueProps() {
             data-reveal
             className="text-xs font-medium uppercase tracking-wider text-accent-500"
           >
-            Why DeckForge
+            How it works
           </p>
           <h2
             data-reveal
             className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl"
           >
-            The deck library for people who care about the work.
+            A living presentation system for modern companies.
           </h2>
         </Reveal>
 

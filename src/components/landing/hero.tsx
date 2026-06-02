@@ -25,17 +25,19 @@ export function Hero({ signedIn, allAccess, priceDisplay }: Props) {
             className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs uppercase tracking-wider text-ink-200"
           >
             <span className="size-1.5 rounded-full bg-accent-500" />
-            {allAccess ? "All-access active" : "New decks every week"}
+            {allAccess ? "All-access active" : "AI-Native Reporting Platform"}
           </p>
           <h1
             data-reveal
             className="mt-6 text-4xl font-semibold tracking-tight text-white sm:text-6xl lg:text-[68px] lg:leading-[1.04]"
           >
-            Business decks that don&apos;t look templated.
+            Your company already has the data.{" "}
+            <span className="text-ink-300">We turn it into executive-ready narratives.</span>
           </h1>
           <p data-reveal className="mt-6 max-w-xl text-lg text-ink-200 sm:text-xl">
-            A curated library of premium presentation templates — pitches, QBRs, sales playbooks,
-            finance reports. Open the one you need in a single click.
+            Automatically generate investor updates, QBRs, strategy decks, and operational reports
+            from your live company data — with cinematic, web-native presentations your team can
+            still fully customize.
           </p>
           <div data-reveal className="mt-8 flex flex-wrap items-center gap-3">
             <PrimaryCta
@@ -53,9 +55,7 @@ export function Hero({ signedIn, allAccess, priceDisplay }: Props) {
           <p data-reveal className="mt-4 text-sm text-ink-300">
             {allAccess
               ? "Templates open in their own app, in a new tab."
-              : signedIn
-                ? "One-time payment. Lifetime access. 30-day money-back guarantee."
-                : "Free to browse. 30-day money-back guarantee on all-access."}
+              : "Built for founders, operators, consultants, and revenue teams."}
           </p>
         </Reveal>
       </div>
@@ -70,7 +70,7 @@ function PrimaryCta({ signedIn, allAccess, priceDisplay }: Props) {
   if (!signedIn) {
     return (
       <Link href="/sign-up" className={buttonClass}>
-        Get started — free
+        Get early access
       </Link>
     );
   }

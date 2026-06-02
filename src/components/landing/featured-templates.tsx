@@ -34,13 +34,13 @@ export async function FeaturedTemplates({ signedIn, allAccess }: Props) {
               data-reveal
               className="text-xs font-medium uppercase tracking-wider text-accent-500"
             >
-              Featured
+              Templates
             </p>
             <h2
               data-reveal
               className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl"
             >
-              Start with one of these.
+              Executive templates built for the work you do.
             </h2>
           </div>
           <Link

@@ -10,7 +10,7 @@ type Props = {
 
 export function LandingCta({ signedIn, allAccess, priceDisplay }: Props) {
   const headline = !signedIn
-    ? "Sign up and the gallery opens immediately."
+    ? "Turn company data into executive narratives."
     : allAccess
       ? "Pick the deck you need and open it."
       : "One-time payment. Every template, forever.";
@@ -32,7 +32,7 @@ export function LandingCta({ signedIn, allAccess, priceDisplay }: Props) {
               data-reveal
               className="text-xs font-medium uppercase tracking-wider text-accent-500"
             >
-              Ready when you are
+              {allAccess ? "Ready when you are" : "Early access"}
             </p>
             <h2
               data-reveal
@@ -43,7 +43,7 @@ export function LandingCta({ signedIn, allAccess, priceDisplay }: Props) {
             <p data-reveal className="mt-4 text-ink-200">
               {allAccess
                 ? "Templates open in their own app, in a new tab — no import, no install."
-                : "Free to browse. One-time payment, 30-day money-back guarantee. Secure checkout via Stripe."}
+                : "Stop rebuilding the same presentations every quarter. Connect your stack, generate your deck, and walk into the meeting ready."}
             </p>
             <div data-reveal className="mt-7 flex flex-wrap items-center gap-3">
               <PrimaryCta
@@ -56,7 +56,7 @@ export function LandingCta({ signedIn, allAccess, priceDisplay }: Props) {
                   href="/sign-in"
                   className="rounded-lg border border-white/15 bg-white/[0.02] px-5 py-3 text-sm font-medium text-white transition hover:bg-white/[0.06]"
                 >
-                  I already have one
+                  Sign in
                 </Link>
               ) : null}
             </div>
@@ -74,7 +74,7 @@ function PrimaryCta({ signedIn, allAccess, priceDisplay }: Props) {
   if (!signedIn) {
     return (
       <Link href="/sign-up" className={buttonClass}>
-        Create your account
+        Request access
       </Link>
     );
   }
