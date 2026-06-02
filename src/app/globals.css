@@ -108,3 +108,17 @@ body {
 
 /* Hero fluid background is rendered entirely on a <canvas> element.
    See src/components/landing/hero-pattern.tsx. No CSS rules needed here. */
+
+/* Integration ticker marquee */
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.animate-ticker {
+  animation: ticker 45s linear infinite;
+}
+
+.animate-ticker:hover {
+  animation-play-state: paused;
+}

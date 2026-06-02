@@ -31,13 +31,12 @@ export function Hero({ signedIn, allAccess, priceDisplay }: Props) {
             data-reveal
             className="mt-6 text-4xl font-semibold tracking-tight text-white sm:text-6xl lg:text-[68px] lg:leading-[1.04]"
           >
-            Your company already has the data.{" "}
-            <span className="text-ink-300">We turn it into executive-ready narratives.</span>
+            Your company data.{" "}
+            <span className="text-ink-300">Turned into executive-ready decks.</span>
           </h1>
           <p data-reveal className="mt-6 max-w-xl text-lg text-ink-200 sm:text-xl">
-            Automatically generate investor updates, QBRs, strategy decks, and operational reports
-            from your live company data — with cinematic, web-native presentations your team can
-            still fully customize.
+            Auto-generate QBRs, board decks, and investor updates from your live data — cinematic,
+            web-native, fully editable.
           </p>
           <div data-reveal className="mt-8 flex flex-wrap items-center gap-3">
             <PrimaryCta

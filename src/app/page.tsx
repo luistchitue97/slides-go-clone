@@ -1,5 +1,6 @@
 import { withAuth } from "@workos-inc/authkit-nextjs";
 import { Hero } from "@/components/landing/hero";
+import { IntegrationTicker } from "@/components/landing/integration-ticker";
 import { ValueProps } from "@/components/landing/value-props";
 import { FeaturedTemplates } from "@/components/landing/featured-templates";
 import { LandingCta } from "@/components/landing/cta";
@@ -22,6 +23,7 @@ export default async function LandingPage() {
   return (
     <>
       <Hero signedIn={signedIn} allAccess={allAccess} priceDisplay={price?.display ?? null} />
+      <IntegrationTicker />
       <ValueProps />
       <FeaturedTemplates signedIn={signedIn} allAccess={allAccess} />
       <LandingCta
