@@ -33,7 +33,7 @@ export async function createOrgAction(
     return { errors: { _: "Could not create the organization — please try again." } };
   }
 
-  redirect("/account?tab=organizations");
+  redirect("/account/organizations");
 }
 
 export async function inviteMemberAction(
@@ -75,7 +75,7 @@ export async function switchOrgAction(formData: FormData) {
   if (!parsed.success) return;
   await withAuth({ ensureSignedIn: true });
   await switchToOrganization(parsed.data.organizationId);
-  redirect("/account?tab=organizations");
+  redirect("/account/organizations");
 }
 
 export async function removeMemberAction(membershipId: string) {
