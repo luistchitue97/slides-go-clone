@@ -22,6 +22,9 @@ export const templates: Template[] = [
     isNew: true,
     publishedAt: "2026-05-18",
   },
+  // --- LEAN LAUNCH: only the QBR is live for now. Uncomment to re-enable the
+  // other reports when we expand the catalog. ---
+  /*
   {
     slug: "north-star-pitch",
     title: "SaaS Pitch",
@@ -114,4 +117,5 @@ export const templates: Template[] = [
     aspectRatio: "16:9",
     publishedAt: "2026-01-09",
   },
+  */
 ];

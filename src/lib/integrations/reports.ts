@@ -36,6 +36,9 @@ export const REPORT_GROUPS: ReportGroup[] = [
       "Revenue performance, pipeline health, product usage, and engineering output in one narrative.",
     integrations: ["Stripe", "HubSpot", "Google Analytics", "PostHog", "Linear", "Datadog"],
   },
+  // --- LEAN LAUNCH: only the QBR is live for now. Uncomment to re-enable the
+  // other report groups when we expand the catalog. ---
+  /*
   {
     key: "investor-update",
     report: "Investor Update",
@@ -70,6 +73,7 @@ export const REPORT_GROUPS: ReportGroup[] = [
       "Incident timelines, deployment frequency, sprint velocity, and infrastructure health.",
     integrations: ["Datadog", "GitHub", "Linear", "Jira", "Asana", "MongoDB", "Notion"],
   },
+  */
 ];
 
 const VALID_KEYS = new Set<string>(REPORT_GROUPS.map((g) => g.key));
