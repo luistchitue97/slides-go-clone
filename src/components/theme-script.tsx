@@ -7,6 +7,5 @@
  */
 export function ThemeScript() {
   const script = `(function(){try{var t=localStorage.getItem('df-theme');if(t==='light')document.documentElement.classList.add('light');}catch(e){}})();`;
-  // eslint-disable-next-line @next/next/no-before-interactive-script-component
   return <script dangerouslySetInnerHTML={{ __html: script }} />;
 }
