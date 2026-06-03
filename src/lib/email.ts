@@ -32,12 +32,12 @@ function getFromAddress(): string {
 }
 
 /**
- * Sends the all-access welcome email after a successful checkout.
- * Called from the Stripe webhook on first insert of a purchase row, so
+ * Sends the welcome email after a successful subscription checkout.
+ * Called from the Stripe webhook on first insert of the subscription row, so
  * duplicate webhook deliveries don't produce duplicate emails.
  */
 export async function sendPurchaseWelcomeEmail({ to }: { to: string }): Promise<void> {
-  const galleryUrl = `${SITE_URL}/reports`;
+  const reportsUrl = `${SITE_URL}/reports`;
   const accountUrl = `${SITE_URL}/account`;
 
   await getResend().emails.send({
@@ -47,17 +47,17 @@ export async function sendPurchaseWelcomeEmail({ to }: { to: string }): Promise<
     // Resend dashboard) instead of the no-reply sender domain.
     replyTo: SUPPORT_EMAIL,
     subject: "Welcome to DeckForge — your subscription is active",
-    html: buildWelcomeHtml({ galleryUrl, accountUrl, supportEmail: SUPPORT_EMAIL }),
-    text: buildWelcomeText({ galleryUrl, accountUrl, supportEmail: SUPPORT_EMAIL }),
+    html: buildWelcomeHtml({ reportsUrl, accountUrl, supportEmail: SUPPORT_EMAIL }),
+    text: buildWelcomeText({ reportsUrl, accountUrl, supportEmail: SUPPORT_EMAIL }),
   });
 }
 
 function buildWelcomeHtml({
-  galleryUrl,
+  reportsUrl,
   accountUrl,
   supportEmail,
 }: {
-  galleryUrl: string;
+  reportsUrl: string;
   accountUrl: string;
   supportEmail: string;
 }): string {
@@ -75,27 +75,27 @@ function buildWelcomeHtml({
                 <p style="margin:0 0 8px;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#a78bfa;">DeckForge</p>
                 <h1 style="margin:0 0 16px;font-size:24px;line-height:1.25;color:#ffffff;font-weight:600;">You're in. Welcome aboard.</h1>
                 <p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#d1d5db;">
-                  Your subscription is active — every report template and integration is yours, current and future. Manage or cancel anytime from your account.
+                  Your subscription is active. DeckForge turns your live company data into executive-ready reports — QBRs, investor updates, board decks, monthly close — and keeps them current. Manage or cancel anytime from your account.
                 </p>
 
                 <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0;">
                   <tr>
                     <td style="background:#ffffff;border-radius:8px;">
-                      <a href="${galleryUrl}" style="display:inline-block;padding:12px 20px;font-size:14px;font-weight:500;color:#0b0b0f;text-decoration:none;">Open the gallery →</a>
+                      <a href="${reportsUrl}" style="display:inline-block;padding:12px 20px;font-size:14px;font-weight:500;color:#0b0b0f;text-decoration:none;">Open your reports →</a>
                     </td>
                   </tr>
                 </table>
 
-                <h2 style="margin:32px 0 12px;font-size:16px;color:#ffffff;font-weight:600;">Getting the most out of DeckForge</h2>
+                <h2 style="margin:32px 0 12px;font-size:16px;color:#ffffff;font-weight:600;">Getting started</h2>
                 <ul style="margin:0 0 16px;padding-left:20px;font-size:14px;line-height:1.7;color:#d1d5db;">
-                  <li><strong style="color:#ffffff;">Open in one click.</strong> Each template is its own app — no import, no install, no migration.</li>
-                  <li><strong style="color:#ffffff;">Pick by job, not by aesthetic.</strong> Each template solves a specific problem (pitch, QBR, postmortem, monthly close). Start with the one that matches the meeting you're walking into.</li>
-                  <li><strong style="color:#ffffff;">Edit live.</strong> You're not downloading a static deck — the template runs, so changes you make stick.</li>
-                  <li><strong style="color:#ffffff;">New decks land regularly.</strong> They appear in your gallery automatically the day they ship. No action needed on your side.</li>
+                  <li><strong style="color:#ffffff;">Connect your stack.</strong> Link Stripe, HubSpot, Notion, Slack, Linear and more — your reports build from live company data, not copy-paste.</li>
+                  <li><strong style="color:#ffffff;">Generate in minutes.</strong> Pick a report — QBR, investor update, board deck, monthly close — and it assembles from your connected data.</li>
+                  <li><strong style="color:#ffffff;">Refine and present.</strong> Every report is a cinematic, web-native presentation you can fully edit — rearrange, rewrite, and rebrand before the meeting.</li>
+                  <li><strong style="color:#ffffff;">Always current.</strong> New report types and integrations ship regularly and appear in your account automatically — included in your subscription.</li>
                 </ul>
 
                 <p style="margin:24px 0 0;font-size:14px;line-height:1.6;color:#d1d5db;">
-                  Manage your purchase or invoices on your <a href="${accountUrl}" style="color:#ffffff;text-decoration:underline;">account page</a>. Questions, requests, or a template you wish existed? Write to <a href="mailto:${supportEmail}" style="color:#ffffff;text-decoration:underline;">${supportEmail}</a>.
+                  Manage your subscription and invoices on your <a href="${accountUrl}" style="color:#ffffff;text-decoration:underline;">account page</a>. Questions, or a report type you wish existed? Write to <a href="mailto:${supportEmail}" style="color:#ffffff;text-decoration:underline;">${supportEmail}</a>.
                 </p>
               </td>
             </tr>
@@ -109,29 +109,29 @@ function buildWelcomeHtml({
 }
 
 function buildWelcomeText({
-  galleryUrl,
+  reportsUrl,
   accountUrl,
   supportEmail,
 }: {
-  galleryUrl: string;
+  reportsUrl: string;
   accountUrl: string;
   supportEmail: string;
 }): string {
   return `You're in. Welcome aboard.
 
-Your subscription is active — every report template and integration is yours, current and future. Manage or cancel anytime from your account.
+Your subscription is active. DeckForge turns your live company data into executive-ready reports — QBRs, investor updates, board decks, monthly close — and keeps them current. Manage or cancel anytime from your account.
 
-Open your reports: ${galleryUrl}
+Open your reports: ${reportsUrl}
 
-Getting the most out of DeckForge:
-- Open in one click. Each template is its own app — no import, no install, no migration.
-- Pick by job, not by aesthetic. Each template solves a specific problem (pitch, QBR, postmortem, monthly close). Start with the one that matches the meeting you're walking into.
-- Edit live. You're not downloading a static deck — the template runs, so changes you make stick.
-- New decks land regularly. They appear in your gallery automatically the day they ship.
+Getting started:
+- Connect your stack. Link Stripe, HubSpot, Notion, Slack, Linear and more — your reports build from live company data, not copy-paste.
+- Generate in minutes. Pick a report — QBR, investor update, board deck, monthly close — and it assembles from your connected data.
+- Refine and present. Every report is a cinematic, web-native presentation you can fully edit — rearrange, rewrite, and rebrand before the meeting.
+- Always current. New report types and integrations ship regularly and appear in your account automatically — included in your subscription.
 
-Manage your purchase or invoices on your account page: ${accountUrl}
+Manage your subscription and invoices on your account page: ${accountUrl}
 
-Questions, requests, or a template you wish existed? Write to ${supportEmail}.
+Questions, or a report type you wish existed? Write to ${supportEmail}.
 
 — DeckForge
 `;
