@@ -44,7 +44,7 @@ export async function FeaturedTemplates({ signedIn, allAccess }: Props) {
             </h2>
           </div>
           <Link
-            href="/gallery"
+            href="/reports"
             data-reveal
             className="hidden whitespace-nowrap rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/5 sm:inline-block light:border-ink-900/15 light:text-ink-900 light:hover:bg-ink-900/5"
           >
@@ -71,7 +71,7 @@ export async function FeaturedTemplates({ signedIn, allAccess }: Props) {
         </Reveal>
 
         <Link
-          href="/gallery"
+          href="/reports"
           className="mt-8 inline-block rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/5 sm:hidden light:border-ink-900/15 light:text-ink-900 light:hover:bg-ink-900/5"
         >
           See all templates →

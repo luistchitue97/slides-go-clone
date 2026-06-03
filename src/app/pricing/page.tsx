@@ -215,8 +215,8 @@ function PrimaryCta({
   if (allAccess) {
     return (
       <div className="flex flex-wrap items-center gap-3">
-        <Link href="/gallery" className={buttonClass}>
-          Open the gallery
+        <Link href="/reports" className={buttonClass}>
+          Open reports
         </Link>
         <form action={openBillingPortal}>
           <button type="submit" className={secondaryButtonClass}>

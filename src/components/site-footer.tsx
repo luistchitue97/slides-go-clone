@@ -9,8 +9,8 @@ export function SiteFooter() {
           <Link href="/" className="hover:text-white light:hover:text-ink-900">
             Home
           </Link>
-          <Link href="/gallery" className="hover:text-white light:hover:text-ink-900">
-            Gallery
+          <Link href="/reports" className="hover:text-white light:hover:text-ink-900">
+            Reports
           </Link>
           <Link href="/pricing" className="hover:text-white light:hover:text-ink-900">
             Pricing

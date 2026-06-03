@@ -38,10 +38,10 @@ export default async function TemplateDetailPage({ params }: Props) {
   return (
     <article className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:py-16">
       <Link
-        href="/gallery"
+        href="/reports"
         className="inline-flex items-center gap-1 text-sm text-ink-300 transition hover:text-white"
       >
-        <span aria-hidden>←</span> Back to gallery
+        <span aria-hidden>←</span> Back to reports
       </Link>
 
       <Reveal as="header" className="mt-6 flex flex-col gap-4" stagger immediate>

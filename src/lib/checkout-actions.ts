@@ -12,9 +12,9 @@ import { SITE_URL } from "@/lib/site";
  *
  * Form input:
  *   - `returnSlug` (optional): if the user cancels, they land back on
- *     /templates/<slug>; otherwise on /gallery.
+ *     /templates/<slug>; otherwise on /reports.
  *
- * Already-entitled users are short-circuited to /gallery so they don't
+ * Already-entitled users are short-circuited to /reports so they don't
  * accidentally double-buy.
  */
 export async function startCheckout(formData: FormData) {
@@ -22,7 +22,7 @@ export async function startCheckout(formData: FormData) {
 
   const entitlements = await getEntitlements(user.id);
   if (entitlements.allAccess) {
-    redirect("/gallery?already_purchased=1");
+    redirect("/reports?already_purchased=1");
   }
 
   const price = await getAllAccessPrice();
@@ -42,7 +42,7 @@ export async function startCheckout(formData: FormData) {
     automatic_tax: { enabled: true },
     allow_promotion_codes: true,
     success_url: `${SITE_URL}/account?purchase=success`,
-    cancel_url: slug ? `${SITE_URL}/templates/${slug}` : `${SITE_URL}/gallery`,
+    cancel_url: slug ? `${SITE_URL}/templates/${slug}` : `${SITE_URL}/reports`,
   });
 
   if (!session.url) {

@@ -47,7 +47,7 @@ function PillLink({
   if (search) params.set("q", search);
   if (sort && sort !== "newest") params.set("sort", sort);
   const qs = params.toString();
-  const href = qs ? `/gallery?${qs}` : "/gallery";
+  const href = qs ? `/reports?${qs}` : "/reports";
 
   return (
     <Link

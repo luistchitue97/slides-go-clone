@@ -80,7 +80,7 @@ function PrimaryCta({ signedIn, allAccess, priceDisplay }: Props) {
   }
   if (allAccess) {
     return (
-      <Link href="/gallery" className={buttonClass}>
+      <Link href="/reports" className={buttonClass}>
         Open the gallery
       </Link>
     );

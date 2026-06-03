@@ -9,7 +9,7 @@ type SearchParams = Promise<{ returnTo?: string }>;
 
 export default async function SignUpPage({ searchParams }: { searchParams: SearchParams }) {
   const { user } = await withAuth();
-  if (user) redirect("/gallery");
+  if (user) redirect("/reports");
 
   const { returnTo } = await searchParams;
 

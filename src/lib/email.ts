@@ -37,7 +37,7 @@ function getFromAddress(): string {
  * duplicate webhook deliveries don't produce duplicate emails.
  */
 export async function sendPurchaseWelcomeEmail({ to }: { to: string }): Promise<void> {
-  const galleryUrl = `${SITE_URL}/gallery`;
+  const galleryUrl = `${SITE_URL}/reports`;
   const accountUrl = `${SITE_URL}/account`;
 
   await getResend().emails.send({

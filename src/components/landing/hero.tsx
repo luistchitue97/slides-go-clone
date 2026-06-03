@@ -45,7 +45,7 @@ export function Hero({ signedIn, allAccess, priceDisplay }: Props) {
               priceDisplay={priceDisplay}
             />
             <Link
-              href="/gallery"
+              href="/reports"
               className="rounded-lg border border-white/15 bg-white/[0.02] px-5 py-3 text-sm font-medium text-white transition hover:bg-white/[0.06] light:border-ink-900/15 light:bg-transparent light:text-ink-900 light:hover:bg-ink-900/5"
             >
               Browse templates
@@ -75,7 +75,7 @@ function PrimaryCta({ signedIn, allAccess, priceDisplay }: Props) {
   }
   if (allAccess) {
     return (
-      <Link href="/gallery" className={buttonClass}>
+      <Link href="/reports" className={buttonClass}>
         Open the gallery
       </Link>
     );

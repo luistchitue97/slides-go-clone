@@ -11,7 +11,7 @@ const baseURL = redirectUri ? new URL(redirectUri).origin : undefined;
 export const GET = handleAuth({
   // Fallback when the OAuth state has no returnPathname (rare —
   // direct hits on /callback). Middleware sets the pathname for normal flows.
-  returnPathname: "/gallery",
+  returnPathname: "/reports",
   baseURL,
   onError: ({ error, request }) => {
     console.error("[auth/callback] error:", error);

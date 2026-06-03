@@ -82,7 +82,7 @@ function PurchaseSuccessBanner({ allAccess }: { allAccess: boolean }) {
         role="status"
         className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 p-3 text-sm text-emerald-100"
       >
-        You&apos;re in. Every template is unlocked — head to the gallery to open one.
+        You&apos;re in. Every template is unlocked — head to reports to open one.
       </p>
     );
   }

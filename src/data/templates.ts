@@ -1,7 +1,7 @@
 import type { Template } from "@/types/template";
 
 // Order in this array drives two things:
-//   1. The default newest-first sort on /gallery (also derivable from
+//   1. The default newest-first sort on /reports (also derivable from
 //      publishedAt — kept here for stability when dates collide).
 //   2. The per-template env-var mapping in getTemplateOrderUrl
 //      (NEXT_PUBLIC_TEMPLATE_ONE_URL → index 0, _TWO_URL → index 1, …).

@@ -88,8 +88,8 @@ function NavLinks({
 
   return (
     <>
-      <Link href="/gallery" className={linkClass}>
-        Gallery
+      <Link href="/reports" className={linkClass}>
+        Reports
       </Link>
       <Link href="/pricing" className={linkClass}>
         Pricing
