@@ -186,10 +186,10 @@ export function PageBackground() {
       cx.fillRect(0, 0, w, h);
 
       // Streaks rendered behind the dot meshes
-      drawStreak(sr0, w, h, 255, 108, 18, 0.90);
-      drawStreak(sr1, w, h, 255, 132, 24, 0.52);
-      drawStreak(sr2, w, h, 255,  88, 12, 0.42);
-      drawStreak(sl0, w, h, 255,  98, 14, 0.48);
+      drawStreak(sr0, w, h, 255, 108, 18, 0.52);
+      drawStreak(sr1, w, h, 255, 132, 24, 0.28);
+      drawStreak(sr2, w, h, 255,  88, 12, 0.22);
+      drawStreak(sl0, w, h, 255,  98, 14, 0.26);
 
       // Dot meshes
       drawMesh("left",  t, w, h);
@@ -208,8 +208,8 @@ export function PageBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 -z-10 h-full w-full opacity-75 hidden lg:block"
-      style={{ filter: "blur(2px)" }}
+      className="fixed inset-0 -z-10 h-full w-full opacity-50 hidden lg:block"
+      style={{ filter: "blur(3px)" }}
       aria-hidden
     />
   );
