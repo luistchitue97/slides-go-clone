@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 import { withAuth } from "@workos-inc/authkit-nextjs";
 import { Reveal } from "@/components/motion/reveal";
 import { getEntitlements } from "@/lib/entitlements";
-import { getSubscriptionPrice } from "@/lib/stripe";
-import { startCheckout } from "@/lib/checkout-actions";
+import { getSubscriptionPrice, type BillingPlan } from "@/lib/stripe";
 import { openBillingPortal } from "@/lib/billing-actions";
+import { PlanSelector } from "./plan-selector";
 
 export const metadata: Metadata = {
   title: "Pricing — One plan. Everything included.",
@@ -36,7 +36,7 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: "How does billing work?",
-    a: "It's a monthly subscription billed automatically each month. You can cancel anytime from your account's billing portal; access continues until the end of the period you've paid for.",
+    a: "Pick monthly or annual billing — annual saves you about 10%. It renews automatically each period, and you can cancel anytime from your account's billing portal; access continues until the end of the period you've paid for.",
   },
   {
     q: "Will I get future templates?",
@@ -52,11 +52,22 @@ export default async function PricingPage() {
   const { user } = await withAuth();
   const signedIn = Boolean(user);
 
-  const [entitlements, price] = await Promise.all([
+  const [entitlements, monthly, yearly] = await Promise.all([
     getEntitlements(user?.id),
-    getAllAccessPriceSafe(),
+    getSubscriptionPriceSafe("monthly"),
+    getSubscriptionPriceSafe("yearly"),
   ]);
   const allAccess = entitlements.allAccess;
+
+  // Savings % is derived from the actual Stripe amounts, so the badge always
+  // reflects reality even if the underlying prices change.
+  const savingsPct =
+    monthly && yearly
+      ? Math.round((1 - yearly.unitAmountCents / (monthly.unitAmountCents * 12)) * 100)
+      : null;
+  const yearlyPerMonthDisplay = yearly
+    ? formatMoney(Math.round(yearly.unitAmountCents / 12), yearly.currency)
+    : null;
 
   return (
     <>
@@ -102,59 +113,60 @@ export default async function PricingPage() {
             className="pointer-events-none absolute -right-24 -top-24 size-[420px] rounded-full bg-accent-500/15 blur-3xl"
           />
           <div className="relative">
-            <div data-reveal className="flex flex-col gap-2">
-              <p
-                className={
-                  allAccess
-                    ? "text-xs font-medium uppercase tracking-wider text-emerald-300"
-                    : "text-xs font-medium uppercase tracking-wider text-accent-500"
-                }
-              >
-                DeckForge Subscription
-              </p>
-              {allAccess ? (
-                <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            {allAccess ? (
+              <>
+                <p
+                  data-reveal
+                  className="text-xs font-medium uppercase tracking-wider text-emerald-300"
+                >
+                  DeckForge Subscription
+                </p>
+                <div data-reveal className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
                   <span className="inline-flex items-center gap-2 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
                     <CheckIcon className="size-7 text-emerald-300" />
                     Active
                   </span>
                   <span className="text-sm text-ink-300">subscription</span>
                 </div>
-              ) : (
-                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                  <span className="text-4xl font-semibold tracking-tight text-white sm:text-5xl light:text-ink-900">
-                    {price?.display ?? "—"}
-                  </span>
-                  <span className="text-sm text-ink-300 light:text-ink-500">
-                    {price?.interval ? `per ${price.interval} · cancel anytime` : "cancel anytime"}
-                  </span>
+
+                <ul data-reveal className="mt-8 space-y-3">
+                  {FEATURES.map((f) => (
+                    <li key={f} className="flex items-start gap-3 text-sm text-ink-100 light:text-ink-700">
+                      <CheckIcon className="mt-0.5 size-5 shrink-0 text-emerald-300" />
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div data-reveal className="mt-9">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Link href="/reports" className={primaryButtonClass}>
+                      Open reports
+                    </Link>
+                    <form action={openBillingPortal}>
+                      <button type="submit" className={secondaryButtonClass}>
+                        Manage billing
+                      </button>
+                    </form>
+                  </div>
+                  <p className="mt-3 text-xs text-ink-300 light:text-ink-500">
+                    Reports open in their own app, in a new tab. Manage your subscription on the
+                    account page.
+                  </p>
                 </div>
-              )}
-            </div>
-
-            <ul data-reveal className="mt-8 space-y-3">
-              {FEATURES.map((f) => (
-                <li key={f} className="flex items-start gap-3 text-sm text-ink-100 light:text-ink-700">
-                  <CheckIcon className="mt-0.5 size-5 shrink-0 text-emerald-300" />
-                  <span>{f}</span>
-                </li>
-              ))}
-            </ul>
-
-            <div data-reveal className="mt-9">
-              <PrimaryCta
-                signedIn={signedIn}
-                allAccess={allAccess}
-                priceDisplay={price?.displayWithInterval ?? null}
-              />
-              <p className="mt-3 text-xs text-ink-300 light:text-ink-500">
-                {allAccess
-                  ? "Reports open in their own app, in a new tab. Manage your subscription on the account page."
-                  : signedIn
-                    ? "Secure checkout via Stripe. Cancel anytime. Tax calculated automatically at checkout."
-                    : "Free to browse. Subscribe when you're ready to open a report."}
-              </p>
-            </div>
+              </>
+            ) : (
+              <div>
+                <PlanSelector
+                  signedIn={signedIn}
+                  monthly={monthly}
+                  yearly={yearly}
+                  savingsPct={savingsPct}
+                  yearlyPerMonthDisplay={yearlyPerMonthDisplay}
+                  features={FEATURES}
+                />
+              </div>
+            )}
           </div>
         </Reveal>
       </section>
@@ -200,48 +212,21 @@ export default async function PricingPage() {
   );
 }
 
-function PrimaryCta({
-  signedIn,
-  allAccess,
-  priceDisplay,
-}: {
-  signedIn: boolean;
-  allAccess: boolean;
-  priceDisplay: string | null;
-}) {
-  const buttonClass =
-    "inline-flex w-full items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-medium text-ink-900 shadow-lift transition hover:bg-white/90 sm:w-auto light:bg-ink-900 light:text-white light:hover:bg-ink-800";
-  const secondaryButtonClass =
-    "inline-flex w-full items-center justify-center rounded-lg border border-white/15 bg-white/[0.02] px-5 py-3 text-sm font-medium text-white transition hover:bg-white/[0.06] sm:w-auto light:border-ink-900/15 light:bg-transparent light:text-ink-900 light:hover:bg-ink-900/5";
+const primaryButtonClass =
+  "inline-flex w-full items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-medium text-ink-900 shadow-lift transition hover:bg-white/90 sm:w-auto light:bg-ink-900 light:text-white light:hover:bg-ink-800";
+const secondaryButtonClass =
+  "inline-flex w-full items-center justify-center rounded-lg border border-white/15 bg-white/[0.02] px-5 py-3 text-sm font-medium text-white transition hover:bg-white/[0.06] sm:w-auto light:border-ink-900/15 light:bg-transparent light:text-ink-900 light:hover:bg-ink-900/5";
 
-  if (allAccess) {
-    return (
-      <div className="flex flex-wrap items-center gap-3">
-        <Link href="/reports" className={buttonClass}>
-          Open reports
-        </Link>
-        <form action={openBillingPortal}>
-          <button type="submit" className={secondaryButtonClass}>
-            Manage billing
-          </button>
-        </form>
-      </div>
-    );
+function formatMoney(cents: number, currency: string): string {
+  try {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency.toUpperCase(),
+      maximumFractionDigits: 0,
+    }).format(cents / 100);
+  } catch {
+    return `${currency.toUpperCase()} ${(cents / 100).toFixed(2)}`;
   }
-  if (!signedIn) {
-    return (
-      <Link href="/sign-up?returnTo=%2Fpricing" className={buttonClass}>
-        Get started — sign up first
-      </Link>
-    );
-  }
-  return (
-    <form action={startCheckout}>
-      <button type="submit" className={buttonClass}>
-        {priceDisplay ? `Subscribe — ${priceDisplay}` : "Subscribe"}
-      </button>
-    </form>
-  );
 }
 
 function CheckIcon({ className }: { className?: string }) {
@@ -261,11 +246,12 @@ function CheckIcon({ className }: { className?: string }) {
   );
 }
 
-async function getAllAccessPriceSafe() {
+async function getSubscriptionPriceSafe(plan: BillingPlan) {
   try {
-    return await getSubscriptionPrice();
+    return await getSubscriptionPrice(plan);
   } catch (err) {
-    console.error("[pricing] failed to load all-access price:", err);
+    // Yearly is optional — a missing STRIPE_PRICE_YEARLY just hides the toggle.
+    console.error(`[pricing] failed to load ${plan} price:`, err);
     return null;
   }
 }

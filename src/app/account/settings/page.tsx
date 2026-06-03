@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { withAuth } from "@workos-inc/authkit-nextjs";
 import { desc, eq } from "drizzle-orm";
 import { signOutAction } from "@/lib/auth-actions";
 import { openBillingPortal } from "@/lib/billing-actions";
 import { db } from "@/db";
-import { purchases } from "@/db/schema";
+import { subscriptions } from "@/db/schema";
 import { getEntitlements } from "@/lib/entitlements";
 
 export const metadata: Metadata = { title: "Settings" };
@@ -15,9 +16,9 @@ export default async function SettingsPage({ searchParams }: { searchParams: Sea
   const { user, impersonator } = await withAuth({ ensureSignedIn: true });
   const { purchase } = await searchParams;
 
-  const [entitlements, history] = await Promise.all([
+  const [entitlements, subscription] = await Promise.all([
     getEntitlements(user.id),
-    getPurchaseHistorySafe(user.id),
+    getSubscriptionSafe(user.id),
   ]);
 
   const showSuccess = purchase === "success";
@@ -49,19 +50,9 @@ export default async function SettingsPage({ searchParams }: { searchParams: Sea
         </div>
       </dl>
 
-      <PurchaseHistory rows={history} />
+      <SubscriptionStatus subscription={subscription} />
 
       <div className="flex flex-wrap items-center gap-3">
-        {history.length > 0 ? (
-          <form action={openBillingPortal}>
-            <button
-              type="submit"
-              className="rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/5 light:border-ink-900/15 light:text-ink-900 light:hover:bg-ink-900/5"
-            >
-              Manage billing
-            </button>
-          </form>
-        ) : null}
         <form action={signOutAction}>
           <button
             type="submit"
@@ -82,7 +73,7 @@ function PurchaseSuccessBanner({ allAccess }: { allAccess: boolean }) {
         role="status"
         className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 p-3 text-sm text-emerald-100"
       >
-        You&apos;re in. Every template is unlocked — head to reports to open one.
+        You&apos;re subscribed. Every report is unlocked — head to reports to open one.
       </p>
     );
   }
@@ -91,84 +82,113 @@ function PurchaseSuccessBanner({ allAccess }: { allAccess: boolean }) {
       role="status"
       className="rounded-lg border border-amber-400/30 bg-amber-400/10 p-3 text-sm text-amber-200"
     >
-      Your purchase is being processed. Refresh in a few seconds — if it stays this way after a
+      Your subscription is being activated. Refresh in a few seconds — if it stays this way after a
       minute, drop us a note.
     </p>
   );
 }
 
-function PurchaseHistory({
-  rows,
-}: {
-  rows: Array<{ id: string; kind: string; amountCents: number; currency: string; purchasedAt: Date }>;
-}) {
-  if (rows.length === 0) {
+type SubscriptionRow = {
+  status: string;
+  currentPeriodEnd: Date | null;
+};
+
+// Maps a Stripe subscription status to a label, badge colour, and whether it
+// currently grants access.
+function statusMeta(status: string): { label: string; badge: string; active: boolean } {
+  switch (status) {
+    case "active":
+      return { label: "Active", badge: "border-emerald-400/30 bg-emerald-400/10 text-emerald-300", active: true };
+    case "trialing":
+      return { label: "Trial", badge: "border-emerald-400/30 bg-emerald-400/10 text-emerald-300", active: true };
+    case "past_due":
+      return { label: "Past due", badge: "border-amber-400/30 bg-amber-400/10 text-amber-300", active: true };
+    case "canceled":
+      return { label: "Canceled", badge: "border-white/15 bg-white/[0.04] text-ink-300 light:border-ink-900/15 light:bg-ink-100 light:text-ink-500", active: false };
+    case "unpaid":
+      return { label: "Unpaid", badge: "border-red-400/30 bg-red-400/10 text-red-300", active: false };
+    default:
+      return { label: status.replace(/_/g, " "), badge: "border-white/15 bg-white/[0.04] text-ink-300 light:border-ink-900/15 light:bg-ink-100 light:text-ink-500", active: false };
+  }
+}
+
+function SubscriptionStatus({ subscription }: { subscription: SubscriptionRow | null }) {
+  if (!subscription) {
     return (
-      <section className="rounded-xl border border-dashed border-white/10 bg-gradient-to-br from-brand-700/25 via-ink-900 to-ink-900 p-5 text-sm text-ink-300 shadow-lift light:border-ink-900/10 light:from-brand-50 light:via-white light:to-white light:text-ink-500">
-        <h2 className="text-base font-medium text-white light:text-ink-900">Purchases</h2>
-        <p className="mt-1">No purchases yet.</p>
+      <section className="rounded-xl border border-dashed border-white/10 bg-gradient-to-br from-brand-700/25 via-ink-900 to-ink-900 p-5 text-sm shadow-lift light:border-ink-900/10 light:from-brand-50 light:via-white light:to-white">
+        <h2 className="text-base font-medium text-white light:text-ink-900">Subscription</h2>
+        <p className="mt-1 text-ink-300 light:text-ink-500">
+          You don&apos;t have an active subscription.
+        </p>
+        <Link
+          href="/pricing"
+          className="mt-4 inline-block rounded-lg bg-white px-4 py-2 text-sm font-medium text-ink-900 transition hover:bg-white/90 light:bg-ink-900 light:text-white light:hover:bg-ink-800"
+        >
+          View plan →
+        </Link>
       </section>
     );
   }
+
+  const meta = statusMeta(subscription.status);
+  const dateLabel = subscription.status === "canceled" ? "Access ends" : "Renews";
+  const dateStr = subscription.currentPeriodEnd
+    ? subscription.currentPeriodEnd.toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
+    : null;
+
   return (
     <section className="rounded-xl border border-white/10 bg-gradient-to-br from-brand-700/25 via-ink-900 to-ink-900 p-5 shadow-lift light:border-ink-900/10 light:from-brand-50 light:via-white light:to-white">
-      <h2 className="text-base font-medium text-white light:text-ink-900">Purchases</h2>
-      <ul className="mt-3 divide-y divide-white/5 text-sm light:divide-ink-900/10">
-        {rows.map((row) => (
-          <li key={row.id} className="flex items-center justify-between py-3">
-            <div>
-              <p className="text-ink-100 light:text-ink-800">{labelFor(row.kind)}</p>
-              <p className="text-xs text-ink-300 light:text-ink-500">
-                {row.purchasedAt.toLocaleDateString(undefined, {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                })}
-              </p>
-            </div>
-            <p className="font-mono text-ink-100 light:text-ink-800">
-              {formatMoney(row.amountCents, row.currency)}
-            </p>
-          </li>
-        ))}
-      </ul>
+      <div className="flex items-center justify-between gap-4">
+        <h2 className="text-base font-medium text-white light:text-ink-900">Subscription</h2>
+        <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${meta.badge}`}>
+          {meta.active ? <span className="size-1.5 rounded-full bg-current" /> : null}
+          {meta.label}
+        </span>
+      </div>
+
+      <dl className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+        <div>
+          <dt className="text-ink-300 light:text-ink-500">Plan</dt>
+          <dd className="mt-1 text-ink-100 light:text-ink-800">DeckForge — monthly</dd>
+        </div>
+        {dateStr ? (
+          <div>
+            <dt className="text-ink-300 light:text-ink-500">{dateLabel}</dt>
+            <dd className="mt-1 text-ink-100 light:text-ink-800">{dateStr}</dd>
+          </div>
+        ) : null}
+      </dl>
+
+      <form action={openBillingPortal} className="mt-5">
+        <button
+          type="submit"
+          className="rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/5 light:border-ink-900/15 light:text-ink-900 light:hover:bg-ink-900/5"
+        >
+          Manage subscription
+        </button>
+      </form>
     </section>
   );
 }
 
-function labelFor(kind: string): string {
-  if (kind === "all_access") return "DeckForge All-Access — lifetime";
-  if (kind.startsWith("template:")) return `Template — ${kind.slice("template:".length)}`;
-  return kind;
-}
-
-function formatMoney(cents: number, currency: string): string {
+async function getSubscriptionSafe(userId: string): Promise<SubscriptionRow | null> {
   try {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: currency.toUpperCase(),
-      maximumFractionDigits: 0,
-    }).format(cents / 100);
-  } catch {
-    return `${currency.toUpperCase()} ${(cents / 100).toFixed(2)}`;
-  }
-}
-
-async function getPurchaseHistorySafe(userId: string) {
-  try {
-    return await db
+    const rows = await db
       .select({
-        id: purchases.id,
-        kind: purchases.kind,
-        amountCents: purchases.amountCents,
-        currency: purchases.currency,
-        purchasedAt: purchases.purchasedAt,
+        status: subscriptions.status,
+        currentPeriodEnd: subscriptions.currentPeriodEnd,
       })
-      .from(purchases)
-      .where(eq(purchases.userId, userId))
-      .orderBy(desc(purchases.purchasedAt));
+      .from(subscriptions)
+      .where(eq(subscriptions.userId, userId))
+      .orderBy(desc(subscriptions.createdAt))
+      .limit(1);
+    return rows[0] ?? null;
   } catch (err) {
-    console.error("[account/settings] failed to load purchase history:", err);
-    return [];
+    console.error("[account/settings] failed to load subscription:", err);
+    return null;
   }
 }

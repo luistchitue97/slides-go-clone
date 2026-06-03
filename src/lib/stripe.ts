@@ -48,15 +48,24 @@ export type SubscriptionPrice = {
   displayWithInterval: string;
 };
 
-let _cachedPrice: SubscriptionPrice | null = null;
+export type BillingPlan = "monthly" | "yearly";
 
-export async function getSubscriptionPrice(): Promise<SubscriptionPrice> {
-  if (_cachedPrice) return _cachedPrice;
+const PLAN_ENV_KEY: Record<BillingPlan, string> = {
+  monthly: "STRIPE_PRICE_MONTHLY",
+  yearly: "STRIPE_PRICE_YEARLY",
+};
 
-  const value = process.env.STRIPE_PRICE_MONTHLY;
+const _cachedPrices: Partial<Record<BillingPlan, SubscriptionPrice>> = {};
+
+export async function getSubscriptionPrice(plan: BillingPlan = "monthly"): Promise<SubscriptionPrice> {
+  const cached = _cachedPrices[plan];
+  if (cached) return cached;
+
+  const envKey = PLAN_ENV_KEY[plan];
+  const value = process.env[envKey];
   if (!value) {
     throw new Error(
-      "STRIPE_PRICE_MONTHLY is not set. Use either a raw price id (price_…) or the lookup_key you set in the Stripe dashboard.",
+      `${envKey} is not set. Use either a raw price id (price_…) or the lookup_key you set in the Stripe dashboard.`,
     );
   }
 
@@ -74,7 +83,7 @@ export async function getSubscriptionPrice(): Promise<SubscriptionPrice> {
   const interval = price.recurring?.interval ?? null;
   const display = formatMoney(price.unit_amount, price.currency);
 
-  _cachedPrice = {
+  const result: SubscriptionPrice = {
     id: price.id,
     currency: price.currency,
     unitAmountCents: price.unit_amount,
@@ -82,7 +91,8 @@ export async function getSubscriptionPrice(): Promise<SubscriptionPrice> {
     display,
     displayWithInterval: interval ? `${display}/${intervalSuffix(interval)}` : display,
   };
-  return _cachedPrice;
+  _cachedPrices[plan] = result;
+  return result;
 }
 
 function intervalSuffix(interval: string): string {

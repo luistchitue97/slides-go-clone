@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { withAuth } from "@workos-inc/authkit-nextjs";
-import { getSubscriptionPrice, getStripe } from "@/lib/stripe";
+import { getSubscriptionPrice, getStripe, type BillingPlan } from "@/lib/stripe";
 import { getEntitlements } from "@/lib/entitlements";
 import { SITE_URL } from "@/lib/site";
 
@@ -25,7 +25,8 @@ export async function startCheckout(formData: FormData) {
     redirect("/reports?already_purchased=1");
   }
 
-  const price = await getSubscriptionPrice();
+  const plan = readPlan(formData);
+  const price = await getSubscriptionPrice(plan);
   const slug = readReturnSlug(formData);
 
   const stripe = getStripe();
@@ -52,6 +53,12 @@ export async function startCheckout(formData: FormData) {
   }
 
   redirect(session.url);
+}
+
+// Defaults to monthly for any missing/unrecognised value so a tampered or
+// stale form can never select an unintended price.
+function readPlan(formData: FormData): BillingPlan {
+  return formData.get("plan") === "yearly" ? "yearly" : "monthly";
 }
 
 function readReturnSlug(formData: FormData): string | undefined {
