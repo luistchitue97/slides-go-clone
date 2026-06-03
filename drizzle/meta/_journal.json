@@ -29,6 +29,13 @@
       "when": 1780498724992,
       "tag": "0003_careful_blindfold",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1780502478127,
+      "tag": "0004_famous_callisto",
+      "breakpoints": true
     }
   ]
 }

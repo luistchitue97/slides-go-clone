@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { withAuth } from "@workos-inc/authkit-nextjs";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { db } from "@/db";
 import { integrationAccounts, reportConnections } from "@/db/schema";
 import { IntegrationsTab } from "../integrations-tab";
@@ -8,29 +8,41 @@ import { isReportKey, type ReportKey } from "@/lib/integrations/reports";
 
 export const metadata: Metadata = { title: "Integrations" };
 
-const PROVIDER = "stripe";
+type ProviderKey = "stripe" | "hubspot";
+const PROVIDERS: ProviderKey[] = ["stripe", "hubspot"];
 
-type StripeConn = { accountId: string; displayName: string | null; externalAccountId: string };
+export type Conn = {
+  accountId: string;
+  displayName: string | null;
+  externalAccountId: string;
+  accessToken: string | null;
+  refreshToken: string | null;
+  tokenExpiresAt: Date | null;
+};
+export type OrgAccount = { id: string; displayName: string | null; externalAccountId: string };
 
 export default async function IntegrationsPage() {
   const { organizationId, role } = await withAuth({ ensureSignedIn: true });
   const isAdmin = role === "admin";
+
+  const emptyAccounts: Record<ProviderKey, OrgAccount[]> = { stripe: [], hubspot: [] };
 
   if (!organizationId) {
     return (
       <IntegrationsTab
         orgPresent={false}
         isAdmin={isAdmin}
-        orgAccounts={[]}
+        orgAccountsByProvider={emptyAccounts}
         connectionsByReport={{}}
       />
     );
   }
 
-  const [accounts, links] = await Promise.all([
+  const [accountRows, linkRows] = await Promise.all([
     db
       .select({
         id: integrationAccounts.id,
+        provider: integrationAccounts.provider,
         displayName: integrationAccounts.displayName,
         externalAccountId: integrationAccounts.externalAccountId,
       })
@@ -38,34 +50,53 @@ export default async function IntegrationsPage() {
       .where(
         and(
           eq(integrationAccounts.organizationId, organizationId),
-          eq(integrationAccounts.provider, PROVIDER),
+          inArray(integrationAccounts.provider, PROVIDERS),
           eq(integrationAccounts.status, "connected"),
         ),
       ),
     db
       .select({
         reportKey: reportConnections.reportKey,
+        provider: reportConnections.provider,
         accountId: reportConnections.accountId,
         displayName: integrationAccounts.displayName,
         externalAccountId: integrationAccounts.externalAccountId,
+        accessToken: integrationAccounts.accessToken,
+        refreshToken: integrationAccounts.refreshToken,
+        tokenExpiresAt: integrationAccounts.tokenExpiresAt,
       })
       .from(reportConnections)
       .innerJoin(integrationAccounts, eq(reportConnections.accountId, integrationAccounts.id))
       .where(
         and(
           eq(reportConnections.organizationId, organizationId),
-          eq(reportConnections.provider, PROVIDER),
+          inArray(reportConnections.provider, PROVIDERS),
         ),
       ),
   ]);
 
-  const connectionsByReport: Partial<Record<ReportKey, StripeConn>> = {};
-  for (const l of links) {
+  const orgAccountsByProvider: Record<ProviderKey, OrgAccount[]> = { stripe: [], hubspot: [] };
+  for (const a of accountRows) {
+    if (a.provider === "stripe" || a.provider === "hubspot") {
+      orgAccountsByProvider[a.provider].push({
+        id: a.id,
+        displayName: a.displayName,
+        externalAccountId: a.externalAccountId,
+      });
+    }
+  }
+
+  const connectionsByReport: Partial<Record<ReportKey, Partial<Record<ProviderKey, Conn>>>> = {};
+  for (const l of linkRows) {
     if (!isReportKey(l.reportKey)) continue;
-    connectionsByReport[l.reportKey] = {
+    if (l.provider !== "stripe" && l.provider !== "hubspot") continue;
+    (connectionsByReport[l.reportKey] ??= {})[l.provider] = {
       accountId: l.accountId,
       displayName: l.displayName,
       externalAccountId: l.externalAccountId,
+      accessToken: l.accessToken,
+      refreshToken: l.refreshToken,
+      tokenExpiresAt: l.tokenExpiresAt,
     };
   }
 
@@ -73,7 +104,7 @@ export default async function IntegrationsPage() {
     <IntegrationsTab
       orgPresent
       isAdmin={isAdmin}
-      orgAccounts={accounts}
+      orgAccountsByProvider={orgAccountsByProvider}
       connectionsByReport={connectionsByReport}
     />
   );

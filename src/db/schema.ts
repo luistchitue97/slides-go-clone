@@ -106,6 +106,12 @@ export const integrationAccounts = pgTable(
     displayName: text("display_name"),
     status: text("status").notNull().default("connected"),
     connectedByUserId: text("connected_by_user_id").notNull(),
+    // OAuth tokens for providers that require them (e.g. HubSpot). Encrypted at
+    // rest (AES-256-GCM, see lib/integrations/crypto). Null for providers like
+    // Stripe Connect, where we read via the platform key + { stripeAccount }.
+    accessToken: text("access_token"),
+    refreshToken: text("refresh_token"),
+    tokenExpiresAt: timestamp("token_expires_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
   },

@@ -1,4 +1,4 @@
-import { startStripeConnect, attachExistingAccount } from "@/lib/integration-actions";
+import { startConnect, attachExistingAccount } from "@/lib/integration-actions";
 
 type OrgAccount = { id: string; displayName: string | null; externalAccountId: string };
 
@@ -6,14 +6,16 @@ const itemClass =
   "block w-full rounded-md px-3 py-2 text-left text-xs text-ink-200 transition hover:bg-white/5 hover:text-white light:text-ink-600 light:hover:bg-ink-900/5 light:hover:text-ink-900";
 
 /**
- * Connect control for a report's Stripe row when the org already has connected
- * account(s): a dropdown to reuse one in a single click (no fresh OAuth), or
- * start a new authorization. Pure CSS via <details> — no client JS.
+ * Connect control for a report's provider row when the org already has
+ * connected account(s): a dropdown to reuse one in a single click (no fresh
+ * OAuth), or start a new authorization. Pure CSS via <details> — no client JS.
  */
-export function ConnectStripeMenu({
+export function ConnectMenu({
+  provider,
   reportKey,
   accounts,
 }: {
+  provider: string;
   reportKey: string;
   accounts: OrgAccount[];
 }) {
@@ -32,6 +34,7 @@ export function ConnectStripeMenu({
         </p>
         {accounts.map((a) => (
           <form key={a.id} action={attachExistingAccount}>
+            <input type="hidden" name="provider" value={provider} />
             <input type="hidden" name="reportKey" value={reportKey} />
             <input type="hidden" name="accountId" value={a.id} />
             <button type="submit" className={`${itemClass} truncate`}>
@@ -40,7 +43,8 @@ export function ConnectStripeMenu({
           </form>
         ))}
         <div className="my-1 border-t border-white/10 light:border-ink-900/10" />
-        <form action={startStripeConnect}>
+        <form action={startConnect}>
+          <input type="hidden" name="provider" value={provider} />
           <input type="hidden" name="reportKey" value={reportKey} />
           <button type="submit" className={itemClass}>
             Connect a different account →

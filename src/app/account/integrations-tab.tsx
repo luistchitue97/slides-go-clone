@@ -23,10 +23,13 @@ import {
   siQuickbooks,
   siXero,
 } from "simple-icons";
-import { REPORT_GROUPS, LIVE_PROVIDERS, type ReportKey } from "@/lib/integrations/reports";
-import { startStripeConnect, disconnectReport } from "@/lib/integration-actions";
-import { ConnectStripeMenu } from "./integrations/connect-stripe-menu";
+import { REPORT_GROUPS, LIVE_PROVIDERS, PROVIDER_KEY, type ReportKey } from "@/lib/integrations/reports";
+import { startConnect, disconnectReport } from "@/lib/integration-actions";
+import { ConnectMenu } from "./integrations/connect-menu";
 import { StripeQbrPreview, StripeQbrPreviewSkeleton } from "./integrations/stripe-qbr-preview";
+import { HubspotQbrPreview } from "./integrations/hubspot-qbr-preview";
+
+type ProviderKey = "stripe" | "hubspot";
 
 const ICONS: Record<string, { path: string }> = {
   Stripe: siStripe,
@@ -53,17 +56,29 @@ const ICONS: Record<string, { path: string }> = {
   Xero: siXero,
 };
 
-type StripeConn = { accountId: string; displayName: string | null; externalAccountId: string };
+type Conn = {
+  accountId: string;
+  displayName: string | null;
+  externalAccountId: string;
+  accessToken: string | null;
+  refreshToken: string | null;
+  tokenExpiresAt: Date | null;
+};
 type OrgAccount = { id: string; displayName: string | null; externalAccountId: string };
 
 type Props = {
   orgPresent: boolean;
   isAdmin: boolean;
-  orgAccounts: OrgAccount[];
-  connectionsByReport: Partial<Record<ReportKey, StripeConn>>;
+  orgAccountsByProvider: Record<ProviderKey, OrgAccount[]>;
+  connectionsByReport: Partial<Record<ReportKey, Partial<Record<ProviderKey, Conn>>>>;
 };
 
-export function IntegrationsTab({ orgPresent, isAdmin, orgAccounts, connectionsByReport }: Props) {
+export function IntegrationsTab({
+  orgPresent,
+  isAdmin,
+  orgAccountsByProvider,
+  connectionsByReport,
+}: Props) {
   return (
     <div className="flex flex-col gap-8">
       <div>
@@ -74,14 +89,14 @@ export function IntegrationsTab({ orgPresent, isAdmin, orgAccounts, connectionsB
           {!orgPresent
             ? "Join or create an organization to connect data sources."
             : isAdmin
-              ? "Connect a source to start pulling live data into each report. Stripe is live; more are coming soon."
-              : "Only org admins can manage connections. Stripe is live; more are coming soon."}
+              ? "Connect a source to start pulling live data into each report. Stripe and HubSpot are live; more are coming soon."
+              : "Only org admins can manage connections. Stripe and HubSpot are live; more are coming soon."}
         </p>
       </div>
 
       <ul className="flex flex-col gap-4">
         {REPORT_GROUPS.map((group) => {
-          const conn = connectionsByReport[group.key];
+          const conns = connectionsByReport[group.key] ?? {};
           return (
             <li
               key={group.key}
@@ -100,6 +115,7 @@ export function IntegrationsTab({ orgPresent, isAdmin, orgAccounts, connectionsB
                 {group.integrations.map((name) => {
                   const icon = ICONS[name];
                   const isLive = LIVE_PROVIDERS.has(name);
+                  const providerKey = PROVIDER_KEY[name];
                   return (
                     <li
                       key={name}
@@ -125,13 +141,14 @@ export function IntegrationsTab({ orgPresent, isAdmin, orgAccounts, connectionsB
                         </span>
                       </div>
 
-                      {isLive ? (
-                        <StripeControl
+                      {isLive && providerKey ? (
+                        <ProviderControl
+                          provider={providerKey}
                           reportKey={group.key}
-                          conn={conn}
+                          conn={conns[providerKey]}
                           orgPresent={orgPresent}
                           isAdmin={isAdmin}
-                          orgAccounts={orgAccounts}
+                          accounts={orgAccountsByProvider[providerKey]}
                         />
                       ) : (
                         <button
@@ -147,10 +164,27 @@ export function IntegrationsTab({ orgPresent, isAdmin, orgAccounts, connectionsB
                 })}
               </ul>
 
-              {group.key === "qbr" && conn ? (
-                <Suspense fallback={<StripeQbrPreviewSkeleton />}>
-                  <StripeQbrPreview stripeAccountId={conn.externalAccountId} />
-                </Suspense>
+              {group.key === "qbr" && conns.stripe ? (
+                <PreviewDisclosure label="View live Stripe data">
+                  <Suspense fallback={<StripeQbrPreviewSkeleton />}>
+                    <StripeQbrPreview stripeAccountId={conns.stripe.externalAccountId} />
+                  </Suspense>
+                </PreviewDisclosure>
+              ) : null}
+
+              {group.key === "qbr" && conns.hubspot ? (
+                <PreviewDisclosure label="View live HubSpot data">
+                  <Suspense fallback={<StripeQbrPreviewSkeleton />}>
+                    <HubspotQbrPreview
+                      account={{
+                        id: conns.hubspot.accountId,
+                        accessToken: conns.hubspot.accessToken,
+                        refreshToken: conns.hubspot.refreshToken,
+                        tokenExpiresAt: conns.hubspot.tokenExpiresAt,
+                      }}
+                    />
+                  </Suspense>
+                </PreviewDisclosure>
               ) : null}
             </li>
           );
@@ -170,20 +204,42 @@ export function IntegrationsTab({ orgPresent, isAdmin, orgAccounts, connectionsB
   );
 }
 
-function StripeControl({
+// Collapsible wrapper so live data panels stay opt-in and don't clutter the
+// page. Native <details> — collapsed by default, no client JS.
+function PreviewDisclosure({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <details className="group mt-3">
+      <summary className="flex w-fit cursor-pointer list-none items-center gap-1.5 text-xs font-medium text-accent-500 transition hover:text-accent-400 [&::-webkit-details-marker]:hidden">
+        <svg
+          viewBox="0 0 16 16"
+          fill="currentColor"
+          className="size-3 transition group-open:rotate-90"
+          aria-hidden
+        >
+          <path d="M6 4l4 4-4 4V4z" />
+        </svg>
+        {label}
+      </summary>
+      {children}
+    </details>
+  );
+}
+
+function ProviderControl({
+  provider,
   reportKey,
   conn,
   orgPresent,
   isAdmin,
-  orgAccounts,
+  accounts,
 }: {
+  provider: ProviderKey;
   reportKey: ReportKey;
-  conn: StripeConn | undefined;
+  conn: Conn | undefined;
   orgPresent: boolean;
   isAdmin: boolean;
-  orgAccounts: OrgAccount[];
+  accounts: OrgAccount[];
 }) {
-  // Connected → status + (admin) disconnect.
   if (conn) {
     return (
       <div className="flex shrink-0 items-center gap-2.5">
@@ -196,6 +252,7 @@ function StripeControl({
         </span>
         {isAdmin ? (
           <form action={disconnectReport}>
+            <input type="hidden" name="provider" value={provider} />
             <input type="hidden" name="reportKey" value={reportKey} />
             <button
               type="submit"
@@ -209,7 +266,6 @@ function StripeControl({
     );
   }
 
-  // Not connected, but actions unavailable.
   if (!orgPresent || !isAdmin) {
     return (
       <button
@@ -223,13 +279,13 @@ function StripeControl({
     );
   }
 
-  // Admin with existing org account(s) → reuse chooser; otherwise plain connect.
-  if (orgAccounts.length > 0) {
-    return <ConnectStripeMenu reportKey={reportKey} accounts={orgAccounts} />;
+  if (accounts.length > 0) {
+    return <ConnectMenu provider={provider} reportKey={reportKey} accounts={accounts} />;
   }
 
   return (
-    <form action={startStripeConnect} className="shrink-0">
+    <form action={startConnect} className="shrink-0">
+      <input type="hidden" name="provider" value={provider} />
       <input type="hidden" name="reportKey" value={reportKey} />
       <button
         type="submit"

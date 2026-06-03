@@ -12,7 +12,13 @@ export type ReportKey =
 
 // Providers that are actually wired up today. Everything else renders as a
 // disabled "coming soon" row.
-export const LIVE_PROVIDERS = new Set<string>(["Stripe"]);
+export const LIVE_PROVIDERS = new Set<string>(["Stripe", "HubSpot"]);
+
+// Provider display name → stable key used in report_connections / actions.
+export const PROVIDER_KEY: Record<string, "stripe" | "hubspot"> = {
+  Stripe: "stripe",
+  HubSpot: "hubspot",
+};
 
 export type ReportGroup = {
   key: ReportKey;

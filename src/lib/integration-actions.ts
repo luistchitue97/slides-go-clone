@@ -11,13 +11,16 @@ import { integrationAccounts, reportConnections } from "@/db/schema";
 import { getStripe } from "@/lib/stripe";
 import { SITE_URL } from "@/lib/site";
 import { isReportKey } from "@/lib/integrations/reports";
+import { buildAuthorizeUrl as hubspotAuthorizeUrl, revokeRefreshToken } from "@/lib/integrations/hubspot";
+import { decryptSecret } from "@/lib/integrations/crypto";
 
-const PROVIDER = "stripe";
-// Kept in sync with the callback route handler (a "use server" module can only
-// export server actions, so this can't be shared via export).
-const STRIPE_CONNECT_NONCE_COOKIE = "stripe_connect_nonce";
+type Provider = "stripe" | "hubspot";
+const PROVIDERS = new Set<Provider>(["stripe", "hubspot"]);
+function isProvider(v: unknown): v is Provider {
+  return typeof v === "string" && PROVIDERS.has(v as Provider);
+}
 
-function getConnectClientId(): string {
+function getStripeConnectClientId(): string {
   const id = process.env.STRIPE_CONNECT_CLIENT_ID;
   if (!id) {
     throw new Error(
@@ -36,20 +39,19 @@ async function requireOrgAdmin(): Promise<string | null> {
   return organizationId;
 }
 
-export async function startStripeConnect(formData: FormData) {
+export async function startConnect(formData: FormData) {
   const organizationId = await requireOrgAdmin();
   if (!organizationId) redirect("/account/organizations");
 
   const reportKey = formData.get("reportKey");
-  if (!isReportKey(reportKey)) return;
+  const provider = formData.get("provider");
+  if (!isReportKey(reportKey) || !isProvider(provider)) return;
 
-  const clientId = getConnectClientId();
-
-  // CSRF: a random nonce lives in an httpOnly cookie and is echoed in `state`;
-  // the callback rejects the response unless they match.
+  // CSRF: a random nonce lives in an httpOnly cookie (per provider) and is
+  // echoed in `state`; the callback rejects the response unless they match.
   const nonce = randomBytes(16).toString("hex");
   const cookieStore = await cookies();
-  cookieStore.set(STRIPE_CONNECT_NONCE_COOKIE, nonce, {
+  cookieStore.set(`${provider}_connect_nonce`, nonce, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
@@ -57,18 +59,22 @@ export async function startStripeConnect(formData: FormData) {
     maxAge: 600,
   });
 
-  const state = Buffer.from(JSON.stringify({ nonce, reportKey })).toString("base64url");
-  const redirectUri = `${SITE_URL}/api/integrations/stripe/callback`;
+  const state = Buffer.from(JSON.stringify({ nonce, reportKey, provider })).toString("base64url");
+  const redirectUri = `${SITE_URL}/api/integrations/${provider}/callback`;
 
-  // Stripe only provisions read_write for Standard Connect platforms by default
-  // (read_only requires a support request). We request read_write but only ever
-  // make read calls — no write endpoints are used anywhere in the app.
-  const url =
-    "https://connect.stripe.com/oauth/authorize?response_type=code" +
-    `&client_id=${encodeURIComponent(clientId)}` +
-    "&scope=read_write" +
-    `&redirect_uri=${encodeURIComponent(redirectUri)}` +
-    `&state=${state}`;
+  let url: string;
+  if (provider === "stripe") {
+    // Stripe only provisions read_write for Standard Connect by default; we only
+    // ever make read calls.
+    url =
+      "https://connect.stripe.com/oauth/authorize?response_type=code" +
+      `&client_id=${encodeURIComponent(getStripeConnectClientId())}` +
+      "&scope=read_write" +
+      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+      `&state=${state}`;
+  } else {
+    url = hubspotAuthorizeUrl({ state, redirectUri });
+  }
 
   redirect(url);
 }
@@ -79,10 +85,11 @@ export async function attachExistingAccount(formData: FormData) {
   if (!organizationId) return;
 
   const reportKey = formData.get("reportKey");
+  const provider = formData.get("provider");
   const accountId = formData.get("accountId");
-  if (!isReportKey(reportKey) || typeof accountId !== "string" || !accountId) return;
+  if (!isReportKey(reportKey) || !isProvider(provider)) return;
+  if (typeof accountId !== "string" || !accountId) return;
 
-  // Verify the account belongs to this org and is live before linking.
   const [account] = await db
     .select({ id: integrationAccounts.id })
     .from(integrationAccounts)
@@ -90,7 +97,7 @@ export async function attachExistingAccount(formData: FormData) {
       and(
         eq(integrationAccounts.id, accountId),
         eq(integrationAccounts.organizationId, organizationId),
-        eq(integrationAccounts.provider, PROVIDER),
+        eq(integrationAccounts.provider, provider),
         eq(integrationAccounts.status, "connected"),
       ),
     )
@@ -99,7 +106,7 @@ export async function attachExistingAccount(formData: FormData) {
 
   await db
     .insert(reportConnections)
-    .values({ organizationId, reportKey, provider: PROVIDER, accountId: account.id })
+    .values({ organizationId, reportKey, provider, accountId: account.id })
     .onConflictDoUpdate({
       target: [
         reportConnections.organizationId,
@@ -117,7 +124,8 @@ export async function disconnectReport(formData: FormData) {
   if (!organizationId) return;
 
   const reportKey = formData.get("reportKey");
-  if (!isReportKey(reportKey)) return;
+  const provider = formData.get("provider");
+  if (!isReportKey(reportKey) || !isProvider(provider)) return;
 
   const [link] = await db
     .select({ accountId: reportConnections.accountId })
@@ -126,7 +134,7 @@ export async function disconnectReport(formData: FormData) {
       and(
         eq(reportConnections.organizationId, organizationId),
         eq(reportConnections.reportKey, reportKey),
-        eq(reportConnections.provider, PROVIDER),
+        eq(reportConnections.provider, provider),
       ),
     )
     .limit(1);
@@ -138,11 +146,11 @@ export async function disconnectReport(formData: FormData) {
       and(
         eq(reportConnections.organizationId, organizationId),
         eq(reportConnections.reportKey, reportKey),
-        eq(reportConnections.provider, PROVIDER),
+        eq(reportConnections.provider, provider),
       ),
     );
 
-  // If no report references this account anymore, deauthorize it at Stripe and
+  // If no report references this account anymore, revoke it at the provider and
   // drop the account row (cleans up rather than leaving an orphan).
   const remaining = await db
     .select({ id: reportConnections.id })
@@ -155,6 +163,7 @@ export async function disconnectReport(formData: FormData) {
       .select({
         id: integrationAccounts.id,
         externalAccountId: integrationAccounts.externalAccountId,
+        refreshToken: integrationAccounts.refreshToken,
       })
       .from(integrationAccounts)
       .where(eq(integrationAccounts.id, link.accountId))
@@ -162,14 +171,17 @@ export async function disconnectReport(formData: FormData) {
 
     if (account) {
       try {
-        await getStripe().oauth.deauthorize({
-          client_id: getConnectClientId(),
-          stripe_user_id: account.externalAccountId,
-        });
+        if (provider === "stripe") {
+          await getStripe().oauth.deauthorize({
+            client_id: getStripeConnectClientId(),
+            stripe_user_id: account.externalAccountId,
+          });
+        } else if (provider === "hubspot" && account.refreshToken) {
+          await revokeRefreshToken(decryptSecret(account.refreshToken));
+        }
       } catch (err) {
-        // Don't fail the disconnect if Stripe rejects the deauthorize (e.g. the
-        // user already revoked from their side). Log and proceed to delete.
-        console.error("[integrations] stripe deauthorize failed:", err);
+        // Don't fail the disconnect if the provider rejects the revoke.
+        console.error(`[integrations] ${provider} revoke failed:`, err);
       }
       await db.delete(integrationAccounts).where(eq(integrationAccounts.id, account.id));
     }
