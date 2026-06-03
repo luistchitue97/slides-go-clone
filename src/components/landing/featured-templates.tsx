@@ -34,13 +34,13 @@ export async function FeaturedTemplates({ signedIn, allAccess }: Props) {
               data-reveal
               className="text-xs font-medium uppercase tracking-wider text-accent-500"
             >
-              Templates
+              Reports
             </p>
             <h2
               data-reveal
               className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl light:text-ink-900"
             >
-              Executive templates built for the work you do.
+              Executive reports built for the work you do.
             </h2>
           </div>
           <Link
@@ -48,7 +48,7 @@ export async function FeaturedTemplates({ signedIn, allAccess }: Props) {
             data-reveal
             className="hidden whitespace-nowrap rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/5 sm:inline-block light:border-ink-900/15 light:text-ink-900 light:hover:bg-ink-900/5"
           >
-            See all templates →
+            See all reports →
           </Link>
         </Reveal>
 

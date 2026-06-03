@@ -42,7 +42,7 @@ export function LandingCta({ signedIn, allAccess, priceDisplay }: Props) {
             </h2>
             <p data-reveal className="mt-4 text-ink-200 light:text-ink-600">
               {allAccess
-                ? "Templates open in their own app, in a new tab — no import, no install."
+                ? "Reports open in their own app, in a new tab — no import, no install."
                 : "Stop rebuilding the same presentations every quarter. Connect your stack, generate your deck, and walk into the meeting ready."}
             </p>
             <div data-reveal className="mt-7 flex flex-wrap items-center gap-3">

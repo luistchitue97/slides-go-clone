@@ -50,12 +50,12 @@ export function Hero({ signedIn, allAccess, priceDisplay }: Props) {
               href="/reports"
               className="rounded-lg border border-white/15 bg-white/[0.02] px-5 py-3 text-sm font-medium text-white transition hover:bg-white/[0.06] light:border-ink-900/15 light:bg-transparent light:text-ink-900 light:hover:bg-ink-900/5"
             >
-              Browse templates
+              Browse reports
             </Link>
           </div>
           <p data-reveal className="mt-4 text-sm text-ink-300 light:text-ink-500">
             {allAccess
-              ? "Templates open in their own app, in a new tab."
+              ? "Reports open in their own app, in a new tab."
               : "Built for founders, operators, consultants, and revenue teams."}
           </p>
         </Reveal>
