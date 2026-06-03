@@ -27,7 +27,7 @@ export default async function AccountSettingsPage({ searchParams }: { searchPara
       {showSuccess ? <PurchaseSuccessBanner allAccess={entitlements.allAccess} /> : null}
 
       {impersonator ? (
-        <p className="rounded-lg border border-amber-400/30 bg-amber-400/10 p-3 text-sm text-amber-200">
+        <p className="rounded-lg border border-amber-400/30 bg-amber-400/10 p-3 text-sm text-amber-200 light:border-amber-600/30 light:bg-amber-50 light:text-amber-800">
           Signed in as this user by <strong>{impersonator.email}</strong>.
         </p>
       ) : null}
@@ -70,7 +70,7 @@ function PurchaseSuccessBanner({ allAccess }: { allAccess: boolean }) {
     return (
       <p
         role="status"
-        className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 p-3 text-sm text-emerald-100"
+        className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 p-3 text-sm text-emerald-100 light:border-emerald-600/30 light:bg-emerald-50 light:text-emerald-800"
       >
         You&apos;re subscribed. Every report is unlocked — head to reports to open one.
       </p>
@@ -79,7 +79,7 @@ function PurchaseSuccessBanner({ allAccess }: { allAccess: boolean }) {
   return (
     <p
       role="status"
-      className="rounded-lg border border-amber-400/30 bg-amber-400/10 p-3 text-sm text-amber-200"
+      className="rounded-lg border border-amber-400/30 bg-amber-400/10 p-3 text-sm text-amber-200 light:border-amber-600/30 light:bg-amber-50 light:text-amber-800"
     >
       Your subscription is being activated. Refresh in a few seconds — if it stays this way after a
       minute, drop us a note.

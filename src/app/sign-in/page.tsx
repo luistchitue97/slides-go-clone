@@ -44,7 +44,7 @@ export default async function SignInPage({ searchParams }: { searchParams: Searc
       {error === "callback" ? (
         <p
           role="alert"
-          className="w-full rounded-lg border border-amber-400/30 bg-amber-400/10 p-3 text-sm text-amber-200"
+          className="w-full rounded-lg border border-amber-400/30 bg-amber-400/10 p-3 text-sm text-amber-200 light:border-amber-600/30 light:bg-amber-50 light:text-amber-800"
         >
           We couldn&apos;t complete your sign-in. Please try again — if it keeps happening, refresh
           and start over.

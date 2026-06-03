@@ -105,7 +105,7 @@ export default async function SecurityPage() {
 
       {/* Non-admin warning */}
       {!isAdmin ? (
-        <div className="rounded-lg border border-amber-400/30 bg-amber-400/10 p-4 text-sm text-amber-200">
+        <div className="rounded-lg border border-amber-400/30 bg-amber-400/10 p-4 text-sm text-amber-200 light:border-amber-600/30 light:bg-amber-50 light:text-amber-800">
           You need admin privileges in <strong>{org?.name ?? "this organisation"}</strong> to
           configure security settings. Switch to an org where you are admin, or ask your org admin
           to make changes.

@@ -67,7 +67,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Sear
       {raw.already_purchased === "1" ? (
         <p
           role="status"
-          className="mt-6 rounded-lg border border-emerald-400/30 bg-emerald-400/10 p-3 text-sm text-emerald-100"
+          className="mt-6 rounded-lg border border-emerald-400/30 bg-emerald-400/10 p-3 text-sm text-emerald-100 light:border-emerald-600/30 light:bg-emerald-50 light:text-emerald-800"
         >
           Your subscription is active — pick a report and open it.
         </p>
