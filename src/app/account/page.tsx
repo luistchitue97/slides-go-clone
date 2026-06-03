@@ -8,6 +8,7 @@ import { db } from "@/db";
 import { purchases } from "@/db/schema";
 import { getEntitlements } from "@/lib/entitlements";
 import { IntegrationsTab } from "./integrations-tab";
+import { OrganizationsTab } from "./organizations-tab";
 
 export const metadata = { title: "Account" };
 
@@ -16,9 +17,12 @@ type SearchParams = Promise<{ purchase?: string; tab?: string }>;
 export default async function AccountPage({ searchParams }: { searchParams: SearchParams }) {
   // Middleware already ensures we're signed in here, but ensureSignedIn
   // makes the type narrow and re-redirects if a stale token slips through.
-  const { user, impersonator } = await withAuth({ ensureSignedIn: true });
+  const { user, impersonator, organizationId } = await withAuth({ ensureSignedIn: true });
   const { purchase, tab } = await searchParams;
-  const activeTab = tab === "integrations" ? "integrations" : "settings";
+  const activeTab =
+    tab === "integrations" ? "integrations"
+    : tab === "organizations" ? "organizations"
+    : "settings";
 
   const [entitlements, history] = await Promise.all([
     getEntitlements(user.id),
@@ -39,6 +43,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Sear
       {/* Tab bar */}
       <div className="flex gap-1 border-b border-white/10 light:border-ink-900/10">
         <TabLink href="/account" active={activeTab === "settings"}>Settings</TabLink>
+        <TabLink href="/account?tab=organizations" active={activeTab === "organizations"}>Organizations</TabLink>
         <TabLink href="/account?tab=integrations" active={activeTab === "integrations"}>Integrations</TabLink>
       </div>
 
@@ -92,6 +97,8 @@ export default async function AccountPage({ searchParams }: { searchParams: Sear
             </form>
           </div>
         </div>
+      ) : activeTab === "organizations" ? (
+        <OrganizationsTab userId={user.id} organizationId={organizationId} />
       ) : (
         <IntegrationsTab />
       )}
