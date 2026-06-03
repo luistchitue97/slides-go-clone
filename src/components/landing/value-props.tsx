@@ -20,7 +20,7 @@ const props = [
 
 export function ValueProps() {
   return (
-    <section className="border-t border-white/5 bg-ink-900/85">
+    <section className="border-t border-white/5 bg-ink-900/85 light:border-ink-900/8 light:bg-[#f5f5f5]">
       <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:py-24">
         <Reveal as="div" className="max-w-2xl" stagger>
           <p
@@ -31,7 +31,7 @@ export function ValueProps() {
           </p>
           <h2
             data-reveal
-            className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl"
+            className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl light:text-ink-900"
           >
             A living presentation system for modern companies.
           </h2>
@@ -46,13 +46,13 @@ export function ValueProps() {
             <li
               key={p.eyebrow}
               data-reveal
-              className="rounded-2xl border border-white/10 bg-ink-900 p-6 transition hover:bg-ink-800"
+              className="rounded-2xl border border-white/10 bg-ink-900 p-6 transition hover:bg-ink-800 light:border-ink-900/10 light:bg-white light:hover:bg-ink-50"
             >
-              <p className="text-xs font-medium uppercase tracking-wider text-brand-300">
+              <p className="text-xs font-medium uppercase tracking-wider text-brand-300 light:text-brand-600">
                 {p.eyebrow}
               </p>
-              <h3 className="mt-3 text-lg font-medium text-white">{p.title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-ink-200">{p.body}</p>
+              <h3 className="mt-3 text-lg font-medium text-white light:text-ink-900">{p.title}</h3>
+              <p className="mt-3 text-sm leading-relaxed text-ink-200 light:text-ink-600">{p.body}</p>
             </li>
           ))}
         </Reveal>

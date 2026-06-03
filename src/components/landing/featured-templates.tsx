@@ -26,7 +26,7 @@ export async function FeaturedTemplates({ signedIn, allAccess }: Props) {
   const locked = signedIn && !allAccess;
 
   return (
-    <section className="border-t border-white/5">
+    <section className="border-t border-white/5 light:border-ink-900/10">
       <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:py-24">
         <Reveal as="div" className="flex items-end justify-between gap-6" stagger>
           <div className="max-w-xl">
@@ -38,7 +38,7 @@ export async function FeaturedTemplates({ signedIn, allAccess }: Props) {
             </p>
             <h2
               data-reveal
-              className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl"
+              className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl light:text-ink-900"
             >
               Executive templates built for the work you do.
             </h2>
@@ -46,7 +46,7 @@ export async function FeaturedTemplates({ signedIn, allAccess }: Props) {
           <Link
             href="/gallery"
             data-reveal
-            className="hidden whitespace-nowrap rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/5 sm:inline-block"
+            className="hidden whitespace-nowrap rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/5 sm:inline-block light:border-ink-900/15 light:text-ink-900 light:hover:bg-ink-900/5"
           >
             See all templates →
           </Link>
@@ -72,7 +72,7 @@ export async function FeaturedTemplates({ signedIn, allAccess }: Props) {
 
         <Link
           href="/gallery"
-          className="mt-8 inline-block rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/5 sm:hidden"
+          className="mt-8 inline-block rounded-lg border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/5 sm:hidden light:border-ink-900/15 light:text-ink-900 light:hover:bg-ink-900/5"
         >
           See all templates →
         </Link>

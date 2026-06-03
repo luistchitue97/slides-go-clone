@@ -32,11 +32,11 @@ export default async function SignInPage({ searchParams }: { searchParams: Searc
   return (
     <section className="flex min-h-[calc(100dvh-3.5rem)] items-center justify-center px-4 sm:px-6">
       <div className="flex w-full max-w-md flex-col items-start gap-5">
-      <span className="text-ink-200 rounded-full border border-white/10 px-3 py-1 text-xs tracking-wider uppercase">
+      <span className="text-ink-200 rounded-full border border-white/10 px-3 py-1 text-xs tracking-wider uppercase light:border-ink-900/10 light:text-ink-500">
         Sign in
       </span>
-      <h1 className="text-3xl font-semibold tracking-tight text-white">Welcome back.</h1>
-      <p className="text-ink-200">
+      <h1 className="text-3xl font-semibold tracking-tight text-white light:text-ink-900">Welcome back.</h1>
+      <p className="text-ink-200 light:text-ink-600">
         Sign in to browse the gallery and open templates. We use WorkOS for secure, hosted
         authentication.
       </p>
@@ -55,15 +55,15 @@ export default async function SignInPage({ searchParams }: { searchParams: Searc
         {safe ? <input type="hidden" name="returnTo" value={safe} /> : null}
         <button
           type="submit"
-          className="text-ink-900 rounded-lg bg-white px-4 py-2 text-sm font-medium transition hover:bg-white/90"
+          className="text-ink-900 rounded-lg bg-white px-4 py-2 text-sm font-medium transition hover:bg-white/90 light:bg-ink-900 light:text-white light:hover:bg-ink-800"
         >
           Continue with WorkOS
         </button>
       </form>
 
-      <p className="text-ink-300 text-sm">
+      <p className="text-ink-300 text-sm light:text-ink-500">
         New here?{" "}
-        <Link href="/sign-up" className="text-white underline-offset-4 hover:underline">
+        <Link href="/sign-up" className="text-white underline-offset-4 hover:underline light:text-ink-900">
           Create an account
         </Link>
       </p>

@@ -12,8 +12,8 @@ type Props = {
 export function Hero({ signedIn, allAccess, priceDisplay }: Props) {
   return (
     <section className="relative overflow-hidden">
-      {/* Gradient overlays for text legibility over the PageBackground canvas. */}
-      <div aria-hidden className="pointer-events-none absolute inset-0">
+      {/* Dark gradient overlays for text legibility in dark mode — hidden in light mode. */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 light:hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-[#030d1e]/80 via-[#030d1e]/35 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-b from-[#030d1e]/50 via-transparent to-[#030d1e]/60" />
       </div>
@@ -22,19 +22,19 @@ export function Hero({ signedIn, allAccess, priceDisplay }: Props) {
         <Reveal as="div" className="max-w-3xl" stagger immediate>
           <p
             data-reveal
-            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs uppercase tracking-wider text-ink-200"
+            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs uppercase tracking-wider text-ink-200 light:border-ink-900/10 light:bg-ink-100/60 light:text-ink-500"
           >
             <span className="size-1.5 rounded-full bg-accent-500" />
             {allAccess ? "All-access active" : "AI-Native Reporting Platform"}
           </p>
           <h1
             data-reveal
-            className="mt-6 text-4xl font-semibold tracking-tight text-white sm:text-6xl lg:text-[68px] lg:leading-[1.04]"
+            className="mt-6 text-4xl font-semibold tracking-tight text-white sm:text-6xl lg:text-[68px] lg:leading-[1.04] light:text-ink-900"
           >
             Your company data.{" "}
-            <span className="text-ink-300">Turned into executive-ready decks.</span>
+            <span className="text-ink-300 light:text-ink-500">Turned into executive-ready decks.</span>
           </h1>
-          <p data-reveal className="mt-6 max-w-xl text-lg text-ink-200 sm:text-xl">
+          <p data-reveal className="mt-6 max-w-xl text-lg text-ink-200 sm:text-xl light:text-ink-600">
             Auto-generate QBRs, board decks, and investor updates from your live data — cinematic,
             web-native, fully editable.
           </p>
@@ -46,12 +46,12 @@ export function Hero({ signedIn, allAccess, priceDisplay }: Props) {
             />
             <Link
               href="/gallery"
-              className="rounded-lg border border-white/15 bg-white/[0.02] px-5 py-3 text-sm font-medium text-white transition hover:bg-white/[0.06]"
+              className="rounded-lg border border-white/15 bg-white/[0.02] px-5 py-3 text-sm font-medium text-white transition hover:bg-white/[0.06] light:border-ink-900/15 light:bg-transparent light:text-ink-900 light:hover:bg-ink-900/5"
             >
               Browse templates
             </Link>
           </div>
-          <p data-reveal className="mt-4 text-sm text-ink-300">
+          <p data-reveal className="mt-4 text-sm text-ink-300 light:text-ink-500">
             {allAccess
               ? "Templates open in their own app, in a new tab."
               : "Built for founders, operators, consultants, and revenue teams."}
@@ -64,7 +64,7 @@ export function Hero({ signedIn, allAccess, priceDisplay }: Props) {
 
 function PrimaryCta({ signedIn, allAccess, priceDisplay }: Props) {
   const buttonClass =
-    "rounded-lg bg-white px-5 py-3 text-sm font-medium text-ink-900 shadow-lift transition hover:bg-white/90";
+    "rounded-lg bg-white px-5 py-3 text-sm font-medium text-ink-900 shadow-lift transition hover:bg-white/90 light:bg-ink-900 light:text-white light:hover:bg-ink-800";
 
   if (!signedIn) {
     return (
@@ -82,7 +82,7 @@ function PrimaryCta({ signedIn, allAccess, priceDisplay }: Props) {
   }
   return (
     <form action={startCheckout}>
-      <button type="submit" className={buttonClass}>
+      <button type="submit" className={buttonClass} suppressHydrationWarning>
         {priceDisplay ? `Get all-access — ${priceDisplay}` : "Get all-access"}
       </button>
     </form>

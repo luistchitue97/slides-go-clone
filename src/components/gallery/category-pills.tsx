@@ -55,8 +55,8 @@ function PillLink({
       aria-current={active ? "page" : undefined}
       className={
         active
-          ? "inline-flex items-center rounded-full bg-white px-3.5 py-1.5 text-xs font-medium text-ink-900 shadow-soft transition"
-          : "inline-flex items-center rounded-full border border-white/10 bg-white/[0.02] px-3.5 py-1.5 text-xs font-medium text-ink-200 transition hover:border-white/20 hover:bg-white/[0.05] hover:text-white"
+          ? "inline-flex items-center rounded-full bg-white px-3.5 py-1.5 text-xs font-medium text-ink-900 shadow-soft transition light:bg-ink-900 light:text-white"
+          : "inline-flex items-center rounded-full border border-white/10 bg-white/[0.02] px-3.5 py-1.5 text-xs font-medium text-ink-200 transition hover:border-white/20 hover:bg-white/[0.05] hover:text-white light:border-ink-900/10 light:bg-transparent light:text-ink-500 light:hover:border-ink-900/20 light:hover:bg-ink-900/5 light:hover:text-ink-900"
       }
     >
       {children}

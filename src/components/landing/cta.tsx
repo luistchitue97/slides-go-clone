@@ -16,11 +16,11 @@ export function LandingCta({ signedIn, allAccess, priceDisplay }: Props) {
       : "One-time payment. Every template, forever.";
 
   return (
-    <section className="border-t border-white/5">
+    <section className="border-t border-white/5 light:border-ink-900/10">
       <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:py-28">
         <Reveal
           as="div"
-          className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-brand-700/30 via-ink-900 to-ink-900 p-10 shadow-lift sm:p-14"
+          className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-brand-700/30 via-ink-900 to-ink-900 p-10 shadow-lift sm:p-14 light:border-ink-900/10 light:from-brand-50 light:via-white light:to-white"
           stagger
         >
           <div
@@ -36,11 +36,11 @@ export function LandingCta({ signedIn, allAccess, priceDisplay }: Props) {
             </p>
             <h2
               data-reveal
-              className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl"
+              className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl light:text-ink-900"
             >
               {headline}
             </h2>
-            <p data-reveal className="mt-4 text-ink-200">
+            <p data-reveal className="mt-4 text-ink-200 light:text-ink-600">
               {allAccess
                 ? "Templates open in their own app, in a new tab — no import, no install."
                 : "Stop rebuilding the same presentations every quarter. Connect your stack, generate your deck, and walk into the meeting ready."}
@@ -54,7 +54,7 @@ export function LandingCta({ signedIn, allAccess, priceDisplay }: Props) {
               {!signedIn ? (
                 <Link
                   href="/sign-in"
-                  className="rounded-lg border border-white/15 bg-white/[0.02] px-5 py-3 text-sm font-medium text-white transition hover:bg-white/[0.06]"
+                  className="rounded-lg border border-white/15 bg-white/[0.02] px-5 py-3 text-sm font-medium text-white transition hover:bg-white/[0.06] light:border-ink-900/15 light:bg-transparent light:text-ink-900 light:hover:bg-ink-900/5"
                 >
                   Sign in
                 </Link>
@@ -69,7 +69,7 @@ export function LandingCta({ signedIn, allAccess, priceDisplay }: Props) {
 
 function PrimaryCta({ signedIn, allAccess, priceDisplay }: Props) {
   const buttonClass =
-    "rounded-lg bg-white px-5 py-3 text-sm font-medium text-ink-900 shadow-lift transition hover:bg-white/90";
+    "rounded-lg bg-white px-5 py-3 text-sm font-medium text-ink-900 shadow-lift transition hover:bg-white/90 light:bg-ink-900 light:text-white light:hover:bg-ink-800";
 
   if (!signedIn) {
     return (

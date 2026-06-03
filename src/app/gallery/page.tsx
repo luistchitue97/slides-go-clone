@@ -59,10 +59,10 @@ export default async function GalleryPage({ searchParams }: { searchParams: Sear
           Gallery
         </p>
         <div data-reveal className="flex flex-wrap items-end justify-between gap-3">
-          <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+          <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl light:text-ink-900">
             Browse the library
           </h1>
-          <p className="text-sm text-ink-300" aria-live="polite">
+          <p className="text-sm text-ink-300 light:text-ink-500" aria-live="polite">
             {count} template{count === 1 ? "" : "s"}
           </p>
         </div>

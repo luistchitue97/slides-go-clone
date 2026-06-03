@@ -72,18 +72,18 @@ export default async function PricingPage() {
           <Reveal as="div" stagger immediate>
             <p
               data-reveal
-              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs uppercase tracking-wider text-ink-200"
+              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs uppercase tracking-wider text-ink-200 light:border-ink-900/10 light:bg-ink-100/60 light:text-ink-500"
             >
               <span className="size-1.5 rounded-full bg-accent-500" />
               Pricing
             </p>
             <h1
               data-reveal
-              className="mt-6 text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl"
+              className="mt-6 text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl light:text-ink-900"
             >
               One price. Every template. Forever.
             </h1>
-            <p data-reveal className="mt-5 text-lg text-ink-200">
+            <p data-reveal className="mt-5 text-lg text-ink-200 light:text-ink-600">
               No subscription. No tiers. Pay once and get everything DeckForge ships — current and
               future.
             </p>
@@ -94,7 +94,7 @@ export default async function PricingPage() {
       <section className="mx-auto max-w-3xl px-4 pb-24 sm:px-6">
         <Reveal
           as="div"
-          className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-brand-700/25 via-ink-900 to-ink-900 p-8 shadow-lift sm:p-12"
+          className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-brand-700/25 via-ink-900 to-ink-900 p-8 shadow-lift sm:p-12 light:border-ink-900/10 light:from-brand-50 light:via-white light:to-white"
           stagger
         >
           <div
@@ -122,17 +122,17 @@ export default async function PricingPage() {
                 </div>
               ) : (
                 <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                  <span className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+                  <span className="text-4xl font-semibold tracking-tight text-white sm:text-5xl light:text-ink-900">
                     {price?.display ?? "—"}
                   </span>
-                  <span className="text-sm text-ink-300">one-time · lifetime access</span>
+                  <span className="text-sm text-ink-300 light:text-ink-500">one-time · lifetime access</span>
                 </div>
               )}
             </div>
 
             <ul data-reveal className="mt-8 space-y-3">
               {FEATURES.map((f) => (
-                <li key={f} className="flex items-start gap-3 text-sm text-ink-100">
+                <li key={f} className="flex items-start gap-3 text-sm text-ink-100 light:text-ink-700">
                   <CheckIcon className="mt-0.5 size-5 shrink-0 text-emerald-300" />
                   <span>{f}</span>
                 </li>
@@ -145,7 +145,7 @@ export default async function PricingPage() {
                 allAccess={allAccess}
                 priceDisplay={price?.display ?? null}
               />
-              <p className="mt-3 text-xs text-ink-300">
+              <p className="mt-3 text-xs text-ink-300 light:text-ink-500">
                 {allAccess
                   ? "Templates open in their own app, in a new tab. Manage billing on the account page."
                   : signedIn
@@ -157,7 +157,7 @@ export default async function PricingPage() {
         </Reveal>
       </section>
 
-      <section className="border-t border-white/5">
+      <section className="border-t border-white/5 light:border-ink-900/10">
         <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:py-20">
           <Reveal as="div" stagger>
             <p
@@ -168,26 +168,26 @@ export default async function PricingPage() {
             </p>
             <h2
               data-reveal
-              className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl"
+              className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl light:text-ink-900"
             >
               What you need to know.
             </h2>
           </Reveal>
 
-          <Reveal as="ul" className="mt-10 divide-y divide-white/10" stagger>
+          <Reveal as="ul" className="mt-10 divide-y divide-white/10 light:divide-ink-900/10" stagger>
             {FAQ.map((item) => (
               <li key={item.q} data-reveal>
                 <details className="group py-5">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-base font-medium text-white">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-base font-medium text-white light:text-ink-900">
                     <span>{item.q}</span>
                     <span
                       aria-hidden
-                      className="text-ink-300 transition group-open:rotate-45"
+                      className="text-ink-300 transition group-open:rotate-45 light:text-ink-500"
                     >
                       +
                     </span>
                   </summary>
-                  <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-200">{item.a}</p>
+                  <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-200 light:text-ink-600">{item.a}</p>
                 </details>
               </li>
             ))}
@@ -208,9 +208,9 @@ function PrimaryCta({
   priceDisplay: string | null;
 }) {
   const buttonClass =
-    "inline-flex w-full items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-medium text-ink-900 shadow-lift transition hover:bg-white/90 sm:w-auto";
+    "inline-flex w-full items-center justify-center rounded-lg bg-white px-5 py-3 text-sm font-medium text-ink-900 shadow-lift transition hover:bg-white/90 sm:w-auto light:bg-ink-900 light:text-white light:hover:bg-ink-800";
   const secondaryButtonClass =
-    "inline-flex w-full items-center justify-center rounded-lg border border-white/15 bg-white/[0.02] px-5 py-3 text-sm font-medium text-white transition hover:bg-white/[0.06] sm:w-auto";
+    "inline-flex w-full items-center justify-center rounded-lg border border-white/15 bg-white/[0.02] px-5 py-3 text-sm font-medium text-white transition hover:bg-white/[0.06] sm:w-auto light:border-ink-900/15 light:bg-transparent light:text-ink-900 light:hover:bg-ink-900/5";
 
   if (allAccess) {
     return (

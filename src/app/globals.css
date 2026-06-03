@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* light: variant — applies when html (or any ancestor) has class "light" */
+@custom-variant light (&:where(.light, .light *));
+
 /* ---------- Design tokens ---------- */
 @theme {
   /* Brand palette */
@@ -65,6 +68,16 @@
 html {
   /* Fallback colour shown before the PageBackground canvas hydrates. */
   background-color: #030d1e;
+}
+
+html.light {
+  color-scheme: light;
+  background-color: #fafafa;
+  --bg: #fafafa;
+  --fg: var(--color-ink-900);
+  --muted: var(--color-ink-500);
+  --surface: #ffffff;
+  --border: color-mix(in oklab, var(--color-ink-900) 10%, transparent);
 }
 
 html,

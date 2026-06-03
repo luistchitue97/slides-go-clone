@@ -74,7 +74,7 @@ export function PageBackground() {
 
     let rafId = 0;
 
-    function drawMesh(side: "left" | "right", t: number, w: number, h: number) {
+    function drawMesh(side: "left" | "right", t: number, w: number, h: number, isLight: boolean) {
       const isLeft = side === "left";
 
       for (let ri = 0; ri < ROWS; ri++) {
@@ -104,16 +104,24 @@ export function PageBackground() {
           }
 
           // Inner dots: large + bright (perspective "closer to viewer")
-          const size  = 0.9 + cu * 2.9;
-          const alpha = 0.08 + cu * 0.74;
+          const size = 0.9 + cu * 2.9;
 
-          // White → cyan: inner dots are cooler and brighter
-          const rv2 = Math.round(155 + cu * 85);
-          const gv  = Math.round(198 + cu * 42);
+          let fillStyle: string;
+          if (isLight) {
+            // Light gray dots — visible depth without competing with content
+            const alpha = 0.10 + cu * 0.50;
+            fillStyle = `rgba(175,178,186,${alpha.toFixed(2)})`;
+          } else {
+            // White → cyan on the dark background
+            const alpha = 0.08 + cu * 0.74;
+            const rv2   = Math.round(155 + cu * 85);
+            const gv    = Math.round(198 + cu * 42);
+            fillStyle = `rgba(${rv2},${gv},255,${alpha.toFixed(2)})`;
+          }
 
           cx.beginPath();
           cx.arc(fx * w, fy * h, size, 0, Math.PI * 2);
-          cx.fillStyle = `rgba(${rv2},${gv},255,${alpha.toFixed(2)})`;
+          cx.fillStyle = fillStyle;
           cx.fill();
         }
       }
@@ -177,23 +185,28 @@ export function PageBackground() {
       const h   = el.clientHeight;
       if (!w || !h) return;
 
-      const t = performance.now() / 1000;
+      const t       = performance.now() / 1000;
+      const isLight = el.ownerDocument.documentElement.classList.contains("light");
 
       cx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      // Dark navy base — matches the deep background in bento-animation.png
-      cx.fillStyle = "#030d1e";
-      cx.fillRect(0, 0, w, h);
+      if (isLight) {
+        // Transparent base — lets html.light background (#f4f5f9) show through
+        cx.clearRect(0, 0, w, h);
+      } else {
+        cx.fillStyle = "#030d1e";
+        cx.fillRect(0, 0, w, h);
+      }
 
-      // Streaks rendered behind the dot meshes
-      drawStreak(sr0, w, h, 255, 108, 18, 0.52);
-      drawStreak(sr1, w, h, 255, 132, 24, 0.28);
-      drawStreak(sr2, w, h, 255,  88, 12, 0.22);
-      drawStreak(sl0, w, h, 255,  98, 14, 0.26);
+      // Streaks — softer in light mode
+      drawStreak(sr0, w, h, 255, 108, 18, isLight ? 0.18 : 0.52);
+      drawStreak(sr1, w, h, 255, 132, 24, isLight ? 0.08 : 0.28);
+      drawStreak(sr2, w, h, 255,  88, 12, isLight ? 0.06 : 0.22);
+      drawStreak(sl0, w, h, 255,  98, 14, isLight ? 0.08 : 0.26);
 
       // Dot meshes
-      drawMesh("left",  t, w, h);
-      drawMesh("right", t, w, h);
+      drawMesh("left",  t, w, h, isLight);
+      drawMesh("right", t, w, h, isLight);
     }
 
     draw();

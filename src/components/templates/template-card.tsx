@@ -31,7 +31,7 @@ export function TemplateCard({ template, priority = false, locked = false, launc
     <Link
       href={href}
       {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-ink-900 shadow-soft transition hover:-translate-y-0.5 hover:border-white/20 hover:bg-ink-800 hover:shadow-lift focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
+      className="group flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-ink-900 shadow-soft transition hover:-translate-y-0.5 hover:border-white/20 hover:bg-ink-800 hover:shadow-lift focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 light:border-ink-900/10 light:bg-white light:hover:border-ink-900/20 light:hover:bg-ink-50"
       aria-label={`${template.title} — ${CATEGORY_LABELS[template.category]}${locked ? " (locked)" : ""}${isExternal ? " (opens in new tab)" : ""}`}
     >
       <div className={`relative aspect-[16/9] overflow-hidden ${customMedia ? "bg-black" : "bg-ink-800"}`}>
@@ -60,11 +60,11 @@ export function TemplateCard({ template, priority = false, locked = false, launc
         ) : null}
       </div>
       <div className="flex flex-1 flex-col p-5">
-        <p className="text-xs font-medium uppercase tracking-wider text-ink-300">
+        <p className="text-xs font-medium uppercase tracking-wider text-ink-300 light:text-ink-500">
           {CATEGORY_LABELS[template.category]}
         </p>
-        <h3 className="mt-1 text-base font-medium text-white">{template.title}</h3>
-        <p className="mt-2 line-clamp-2 text-sm text-ink-200">{template.shortDescription}</p>
+        <h3 className="mt-1 text-base font-medium text-white light:text-ink-900">{template.title}</h3>
+        <p className="mt-2 line-clamp-2 text-sm text-ink-200 light:text-ink-600">{template.shortDescription}</p>
       </div>
     </Link>
   );

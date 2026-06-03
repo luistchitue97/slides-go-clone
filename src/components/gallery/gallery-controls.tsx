@@ -67,7 +67,7 @@ export function GalleryControls({
     >
       <label className="relative flex-1">
         <span className="sr-only">Search templates</span>
-        <SearchIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-300" />
+        <SearchIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-300 light:text-ink-400" />
         <input
           type="search"
           inputMode="search"
@@ -76,16 +76,16 @@ export function GalleryControls({
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Search by title or tag…"
           autoComplete="off"
-          className="w-full rounded-lg border border-white/10 bg-white/[0.02] py-2 pl-9 pr-3 text-sm text-white placeholder:text-ink-300 focus:border-white/25 focus:bg-white/[0.04] focus:outline-none"
+          className="w-full rounded-lg border border-white/10 bg-white/[0.02] py-2 pl-9 pr-3 text-sm text-white placeholder:text-ink-300 focus:border-white/25 focus:bg-white/[0.04] focus:outline-none light:border-ink-900/10 light:bg-white light:text-ink-900 light:placeholder:text-ink-400 light:focus:border-ink-900/25 light:focus:bg-white"
         />
       </label>
-      <label className="flex items-center gap-2 text-sm text-ink-200">
+      <label className="flex items-center gap-2 text-sm text-ink-200 light:text-ink-600">
         <span className="sr-only sm:not-sr-only">Sort</span>
         <select
           name="sort"
           value={sort}
           onChange={(e) => onSortChange(e.target.value)}
-          className="rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2 text-sm text-white focus:border-white/25 focus:bg-white/[0.04] focus:outline-none"
+          className="rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2 text-sm text-white focus:border-white/25 focus:bg-white/[0.04] focus:outline-none light:border-ink-900/10 light:bg-white light:text-ink-900 light:focus:border-ink-900/25"
         >
           <option value="newest">Newest</option>
           <option value="alpha">A–Z</option>
