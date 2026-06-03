@@ -4,10 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const tabs = [
-  { label: "Settings",      href: "/account/settings" },
-  { label: "Organizations", href: "/account/organizations" },
-  { label: "Security",      href: "/account/security" },
-  { label: "Integrations",  href: "/account/integrations" },
+  { label: "Settings",      href: "/account",               exact: true },
+  { label: "Organizations", href: "/account/organizations", exact: false },
+  { label: "Security",      href: "/account/security",      exact: false },
+  { label: "Integrations",  href: "/account/integrations",  exact: false },
 ];
 
 export function AccountTabs() {
@@ -16,7 +16,11 @@ export function AccountTabs() {
   return (
     <div className="flex gap-1 border-b border-white/10 light:border-ink-900/10">
       {tabs.map((tab) => {
-        const active = pathname === tab.href || pathname.startsWith(tab.href + "/");
+        // Settings is the index route, so it must match exactly — otherwise it
+        // would stay highlighted on every nested /account/* page.
+        const active = tab.exact
+          ? pathname === tab.href
+          : pathname === tab.href || pathname.startsWith(tab.href + "/");
         return (
           <Link
             key={tab.href}
