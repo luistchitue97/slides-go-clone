@@ -69,7 +69,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Sear
           role="status"
           className="mt-6 rounded-lg border border-emerald-400/30 bg-emerald-400/10 p-3 text-sm text-emerald-100"
         >
-          You already have all-access — pick a report and open it.
+          Your subscription is active — pick a report and open it.
         </p>
       ) : null}
 

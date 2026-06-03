@@ -25,7 +25,7 @@ export function Hero({ signedIn, allAccess, priceDisplay }: Props) {
             className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs uppercase tracking-wider text-ink-200 light:border-ink-900/10 light:bg-ink-100/60 light:text-ink-500"
           >
             <span className="size-1.5 rounded-full bg-accent-500" />
-            {allAccess ? "All-access active" : "AI-Native Reporting Platform"}
+            {allAccess ? "Subscription active" : "AI-Native Reporting Platform"}
           </p>
           <h1
             data-reveal
@@ -83,7 +83,7 @@ function PrimaryCta({ signedIn, allAccess, priceDisplay }: Props) {
   return (
     <form action={startCheckout}>
       <button type="submit" className={buttonClass} suppressHydrationWarning>
-        {priceDisplay ? `Get all-access — ${priceDisplay}` : "Get all-access"}
+        {priceDisplay ? `Subscribe — ${priceDisplay}` : "Subscribe"}
       </button>
     </form>
   );

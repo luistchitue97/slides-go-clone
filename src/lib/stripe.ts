@@ -30,29 +30,33 @@ export function getWebhookSecret(): string {
 }
 
 /**
- * The all-access price, cached for the lifetime of the process. The env var
+ * The subscription price, cached for the lifetime of the process. The env var
  * may hold either a raw price id (`price_…`) or a Stripe lookup_key. Using
  * a lookup_key lets us swap the underlying Price object without a code
  * deploy. The cached object also surfaces a pre-formatted display string
- * for "Buy access — $X" CTAs.
+ * for "Subscribe — $X/mo" CTAs.
  */
-export type AllAccessPrice = {
+export type SubscriptionPrice = {
   id: string;
   currency: string;
   unitAmountCents: number;
-  /** e.g. "$99.00" — locale-naive; suitable for English UIs. */
+  /** Billing interval, e.g. "month" | "year". null for non-recurring prices. */
+  interval: string | null;
+  /** e.g. "$500" — locale-naive; suitable for English UIs. No interval suffix. */
   display: string;
+  /** e.g. "$500/mo" — display with the interval suffix appended. */
+  displayWithInterval: string;
 };
 
-let _cachedPrice: AllAccessPrice | null = null;
+let _cachedPrice: SubscriptionPrice | null = null;
 
-export async function getAllAccessPrice(): Promise<AllAccessPrice> {
+export async function getSubscriptionPrice(): Promise<SubscriptionPrice> {
   if (_cachedPrice) return _cachedPrice;
 
-  const value = process.env.STRIPE_PRICE_ALL_ACCESS;
+  const value = process.env.STRIPE_PRICE_MONTHLY;
   if (!value) {
     throw new Error(
-      "STRIPE_PRICE_ALL_ACCESS is not set. Use either a raw price id (price_…) or the lookup_key you set in the Stripe dashboard.",
+      "STRIPE_PRICE_MONTHLY is not set. Use either a raw price id (price_…) or the lookup_key you set in the Stripe dashboard.",
     );
   }
 
@@ -67,13 +71,26 @@ export async function getAllAccessPrice(): Promise<AllAccessPrice> {
     );
   }
 
+  const interval = price.recurring?.interval ?? null;
+  const display = formatMoney(price.unit_amount, price.currency);
+
   _cachedPrice = {
     id: price.id,
     currency: price.currency,
     unitAmountCents: price.unit_amount,
-    display: formatMoney(price.unit_amount, price.currency),
+    interval,
+    display,
+    displayWithInterval: interval ? `${display}/${intervalSuffix(interval)}` : display,
   };
   return _cachedPrice;
+}
+
+function intervalSuffix(interval: string): string {
+  if (interval === "month") return "mo";
+  if (interval === "year") return "yr";
+  if (interval === "week") return "wk";
+  if (interval === "day") return "day";
+  return interval;
 }
 
 async function resolveByLookupKey(stripe: Stripe, lookupKey: string): Promise<Stripe.Price> {

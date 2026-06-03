@@ -1,8 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 import type Stripe from "stripe";
+import { eq } from "drizzle-orm";
 import { getStripe, getWebhookSecret } from "@/lib/stripe";
 import { db } from "@/db";
-import { appUsers, purchases } from "@/db/schema";
+import { appUsers, subscriptions } from "@/db/schema";
 import { sendPurchaseWelcomeEmail } from "@/lib/email";
 
 /**
@@ -20,10 +21,6 @@ import { sendPurchaseWelcomeEmail } from "@/lib/email";
 export const runtime = "nodejs";
 // Stripe sends the raw body; ensure Next never caches a response.
 export const dynamic = "force-dynamic";
-
-// Allowlist of values we accept in session.metadata.kind. Extend here when
-// adding per-template purchases (e.g. /^template:[a-z0-9-]+$/ matchers).
-const KNOWN_PURCHASE_KINDS = new Set(["all_access"]);
 
 // Stripe sets "paid" for normal charges and "no_payment_required" when a
 // 100%-off promotion code (e.g. a friends-and-family comp) zeros the total.
@@ -54,6 +51,11 @@ export async function POST(request: NextRequest) {
     switch (event.type) {
       case "checkout.session.completed": {
         await handleCheckoutCompleted(event.data.object);
+        break;
+      }
+      case "customer.subscription.updated":
+      case "customer.subscription.deleted": {
+        await handleSubscriptionChanged(event.data.object);
         break;
       }
       default:
@@ -95,44 +97,40 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     throw new Error(`Checkout session ${session.id} has no customer email`);
   }
 
-  // Kind allowlist — defense in depth. Even with a valid signature, we
-  // refuse to write an unknown kind into purchases (would otherwise let
-  // a leaked webhook secret or an attacker who tricks our checkout flow
-  // into using a junk metadata value pollute the table).
-  const rawKind = (session.metadata?.kind ?? "all_access").toString();
-  if (!KNOWN_PURCHASE_KINDS.has(rawKind)) {
-    console.warn(
-      `[stripe/webhook] unknown kind="${rawKind}" on session ${session.id}; ignoring`,
+  const subscriptionId = idOf(session.subscription);
+  const customerId = idOf(session.customer);
+  if (!subscriptionId || !customerId) {
+    throw new Error(
+      `Checkout session ${session.id} completed without a subscription/customer — expected mode=subscription`,
     );
-    return;
   }
-  const kind = rawKind;
 
-  const amountCents = session.amount_total ?? 0;
-  const currency = (session.currency ?? "usd").toLowerCase();
+  // Fetch the subscription for its authoritative status + period end. The
+  // session itself doesn't carry these.
+  const subscription = await getStripe().subscriptions.retrieve(subscriptionId);
 
-  // Upsert the user row so the FK from purchases always resolves. Keeping
+  // Upsert the user row so the FK from subscriptions always resolves. Keeping
   // the email fresh on conflict means a later email change in WorkOS
-  // propagates the next time the user buys something.
+  // propagates the next time the user transacts.
   await db
     .insert(appUsers)
     .values({ id: workosUserId, email })
     .onConflictDoUpdate({ target: appUsers.id, set: { email } });
 
-  // Idempotent on session id: a duplicate webhook delivery becomes a no-op.
+  // Idempotent on the subscription id: a duplicate delivery becomes a no-op.
   // .returning() lets us tell first-write from no-op so the welcome email
-  // only fires once per purchase even if Stripe retries the delivery.
+  // only fires once even if Stripe retries the delivery.
   const inserted = await db
-    .insert(purchases)
+    .insert(subscriptions)
     .values({
       userId: workosUserId,
-      kind,
-      stripeSessionId: session.id,
-      amountCents,
-      currency,
+      stripeSubscriptionId: subscriptionId,
+      stripeCustomerId: customerId,
+      status: subscription.status,
+      currentPeriodEnd: periodEndOf(subscription),
     })
-    .onConflictDoNothing({ target: purchases.stripeSessionId })
-    .returning({ id: purchases.id });
+    .onConflictDoNothing({ target: subscriptions.stripeSubscriptionId })
+    .returning({ id: subscriptions.id });
 
   if (inserted.length > 0) {
     // Email failures must not 500 the webhook (Stripe would retry, the insert
@@ -144,4 +142,59 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       console.error(`[stripe/webhook] welcome email failed for session ${session.id}:`, err);
     }
   }
+}
+
+/**
+ * Keeps the subscriptions row in sync on customer.subscription.updated and
+ * .deleted. Upserts by stripe_subscription_id so it's robust to event
+ * ordering (a status change that races ahead of checkout.session.completed
+ * still lands). Revocation is implicit: once status flips to canceled/unpaid,
+ * getEntitlements stops granting access.
+ */
+async function handleSubscriptionChanged(subscription: Stripe.Subscription) {
+  const subscriptionId = subscription.id;
+  const customerId = idOf(subscription.customer);
+  const workosUserId = subscription.metadata?.workos_user_id;
+  const status = subscription.status;
+  const periodEnd = periodEndOf(subscription);
+
+  // If we can identify the user (metadata is set at checkout), upsert so an
+  // out-of-order event can create the row. Otherwise fall back to updating an
+  // existing row by subscription id only.
+  if (workosUserId && customerId) {
+    await db
+      .insert(subscriptions)
+      .values({
+        userId: workosUserId,
+        stripeSubscriptionId: subscriptionId,
+        stripeCustomerId: customerId,
+        status,
+        currentPeriodEnd: periodEnd,
+      })
+      .onConflictDoUpdate({
+        target: subscriptions.stripeSubscriptionId,
+        set: { status, currentPeriodEnd: periodEnd, updatedAt: new Date() },
+      });
+    return;
+  }
+
+  await db
+    .update(subscriptions)
+    .set({ status, currentPeriodEnd: periodEnd, updatedAt: new Date() })
+    .where(eq(subscriptions.stripeSubscriptionId, subscriptionId));
+}
+
+/** Stripe fields are `string | { id } | null`; normalise to the id string. */
+function idOf(ref: string | { id: string } | null | undefined): string | null {
+  if (!ref) return null;
+  return typeof ref === "string" ? ref : ref.id;
+}
+
+/**
+ * In recent Stripe API versions current_period_end moved from the
+ * Subscription to its items. Read it from the first item; null if absent.
+ */
+function periodEndOf(subscription: Stripe.Subscription): Date | null {
+  const unix = subscription.items?.data?.[0]?.current_period_end;
+  return typeof unix === "number" ? new Date(unix * 1000) : null;
 }

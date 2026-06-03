@@ -44,6 +44,29 @@ export const purchases = pgTable("purchases", {
 });
 
 /**
+ * One row per Stripe subscription. The webhook is the only writer:
+ *   - checkout.session.completed → first insert (status from Stripe)
+ *   - customer.subscription.updated/deleted → status + period end refresh
+ *
+ * Access is granted while `status` is active/trialing (see lib/entitlements).
+ * stripe_subscription_id is unique so repeated webhook deliveries upsert
+ * the same row rather than duplicating it.
+ */
+export const subscriptions = pgTable("subscriptions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => appUsers.id, { onDelete: "cascade" }),
+  stripeSubscriptionId: text("stripe_subscription_id").notNull().unique(),
+  stripeCustomerId: text("stripe_customer_id").notNull(),
+  // Stripe status: active | trialing | past_due | canceled | unpaid | incomplete | …
+  status: text("status").notNull(),
+  currentPeriodEnd: timestamp("current_period_end", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+/**
  * Per-user, per-template configuration store. Shared across all template
  * subdomains so a customization made on one host follows the user everywhere.
  * Composite PK (user_id, template_id) gives upsert-by-pair semantics.
@@ -67,5 +90,7 @@ export type AppUser = typeof appUsers.$inferSelect;
 export type NewAppUser = typeof appUsers.$inferInsert;
 export type Purchase = typeof purchases.$inferSelect;
 export type NewPurchase = typeof purchases.$inferInsert;
+export type Subscription = typeof subscriptions.$inferSelect;
+export type NewSubscription = typeof subscriptions.$inferInsert;
 export type TemplateCustomization = typeof templateCustomizations.$inferSelect;
 export type NewTemplateCustomization = typeof templateCustomizations.$inferInsert;

@@ -5,7 +5,7 @@ import { ValueProps } from "@/components/landing/value-props";
 import { FeaturedTemplates } from "@/components/landing/featured-templates";
 import { LandingCta } from "@/components/landing/cta";
 import { getEntitlements } from "@/lib/entitlements";
-import { getAllAccessPrice } from "@/lib/stripe";
+import { getSubscriptionPrice } from "@/lib/stripe";
 
 export default async function LandingPage() {
   const { user } = await withAuth();
@@ -22,14 +22,14 @@ export default async function LandingPage() {
 
   return (
     <>
-      <Hero signedIn={signedIn} allAccess={allAccess} priceDisplay={price?.display ?? null} />
+      <Hero signedIn={signedIn} allAccess={allAccess} priceDisplay={price?.displayWithInterval ?? null} />
       <IntegrationTicker />
       <ValueProps />
       <FeaturedTemplates signedIn={signedIn} allAccess={allAccess} />
       <LandingCta
         signedIn={signedIn}
         allAccess={allAccess}
-        priceDisplay={price?.display ?? null}
+        priceDisplay={price?.displayWithInterval ?? null}
       />
     </>
   );
@@ -37,7 +37,7 @@ export default async function LandingPage() {
 
 async function getAllAccessPriceSafe() {
   try {
-    return await getAllAccessPrice();
+    return await getSubscriptionPrice();
   } catch (err) {
     console.error("[landing] failed to load all-access price:", err);
     return null;

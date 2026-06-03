@@ -46,7 +46,7 @@ export async function sendPurchaseWelcomeEmail({ to }: { to: string }): Promise<
     // Replies go to the support inbox (received via Resend, read in the
     // Resend dashboard) instead of the no-reply sender domain.
     replyTo: SUPPORT_EMAIL,
-    subject: "Welcome to DeckForge — your all-access is active",
+    subject: "Welcome to DeckForge — your subscription is active",
     html: buildWelcomeHtml({ galleryUrl, accountUrl, supportEmail: SUPPORT_EMAIL }),
     text: buildWelcomeText({ galleryUrl, accountUrl, supportEmail: SUPPORT_EMAIL }),
   });
@@ -75,7 +75,7 @@ function buildWelcomeHtml({
                 <p style="margin:0 0 8px;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#a78bfa;">DeckForge</p>
                 <h1 style="margin:0 0 16px;font-size:24px;line-height:1.25;color:#ffffff;font-weight:600;">You're in. Welcome aboard.</h1>
                 <p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#d1d5db;">
-                  Your all-access pass is active — every template in the library is yours, current and future. No subscription, no renewal, no extra steps.
+                  Your subscription is active — every report template and integration is yours, current and future. Manage or cancel anytime from your account.
                 </p>
 
                 <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0;">
@@ -119,9 +119,9 @@ function buildWelcomeText({
 }): string {
   return `You're in. Welcome aboard.
 
-Your all-access pass is active — every template in the library is yours, current and future. No subscription, no renewal, no extra steps.
+Your subscription is active — every report template and integration is yours, current and future. Manage or cancel anytime from your account.
 
-Open the gallery: ${galleryUrl}
+Open your reports: ${galleryUrl}
 
 Getting the most out of DeckForge:
 - Open in one click. Each template is its own app — no import, no install, no migration.

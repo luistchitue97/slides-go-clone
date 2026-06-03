@@ -13,7 +13,7 @@ export function LandingCta({ signedIn, allAccess, priceDisplay }: Props) {
     ? "Turn company data into executive narratives."
     : allAccess
       ? "Pick the deck you need and open it."
-      : "One-time payment. Every template, forever.";
+      : "One subscription. Every report, every integration.";
 
   return (
     <section className="border-t border-white/5 light:border-ink-900/10">
@@ -88,7 +88,7 @@ function PrimaryCta({ signedIn, allAccess, priceDisplay }: Props) {
   return (
     <form action={startCheckout}>
       <button type="submit" className={buttonClass}>
-        {priceDisplay ? `Get all-access — ${priceDisplay}` : "Get all-access"}
+        {priceDisplay ? `Subscribe — ${priceDisplay}` : "Subscribe"}
       </button>
     </form>
   );

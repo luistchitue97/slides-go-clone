@@ -3,48 +3,48 @@ import type { Metadata } from "next";
 import { withAuth } from "@workos-inc/authkit-nextjs";
 import { Reveal } from "@/components/motion/reveal";
 import { getEntitlements } from "@/lib/entitlements";
-import { getAllAccessPrice } from "@/lib/stripe";
+import { getSubscriptionPrice } from "@/lib/stripe";
 import { startCheckout } from "@/lib/checkout-actions";
 import { openBillingPortal } from "@/lib/billing-actions";
 
 export const metadata: Metadata = {
-  title: "Pricing — One price. Every template. Forever.",
+  title: "Pricing — One plan. Everything included.",
   description:
-    "Lifetime access to every DeckForge business presentation template — current and future. One-time payment, no subscription.",
+    "Full access to every DeckForge executive report template and integration for one monthly subscription. Cancel anytime.",
   alternates: { canonical: "/pricing" },
   openGraph: {
     title: "DeckForge Pricing",
     description:
-      "One-time payment. Lifetime access to every business presentation template in DeckForge.",
+      "One monthly subscription. Every report template and integration, current and future.",
     type: "website",
   },
 };
 
 const FEATURES = [
-  "Every template in the library — current and future",
+  "Every report template — current and future",
+  "All data integrations included",
   "New templates added every week",
-  "Open any template in one click — no import, no install",
-  "Designed for boardrooms and 13\" laptops alike",
-  "Built by people who present for a living",
-  "Pay once. Yours forever.",
+  "Open any report in one click — no import, no install",
+  "Priority support",
+  "Cancel anytime, no lock-in",
 ];
 
 const FAQ: Array<{ q: string; a: string }> = [
   {
     q: "What's included?",
-    a: "Every template in the gallery today, plus every template we add later. There is no \"premium tier\" — once you have all-access, you have all of it.",
+    a: "Every report template and integration available today, plus everything we add later. One plan, no tiers — you get all of it.",
   },
   {
-    q: "Is this a subscription?",
-    a: "No. It's a one-time payment for lifetime access. Pay once, never get billed again.",
+    q: "How does billing work?",
+    a: "It's a monthly subscription billed automatically each month. You can cancel anytime from your account's billing portal; access continues until the end of the period you've paid for.",
   },
   {
     q: "Will I get future templates?",
-    a: "Yes. New templates land roughly every week. You get them automatically — they appear in the gallery the day they ship.",
+    a: "Yes. New templates land roughly every week and appear in your reports automatically — included in your subscription at no extra cost.",
   },
   {
-    q: "Can I get a refund?",
-    a: "Within 30 days of purchase, just reply to your receipt email and we'll refund you, no questions. After 30 days the sale is final.",
+    q: "Can I cancel or get a refund?",
+    a: "Cancel anytime — you keep access through the end of the current billing period. For refund requests, reply to any receipt email within 30 days and we'll sort it out.",
   },
 ];
 
@@ -81,11 +81,11 @@ export default async function PricingPage() {
               data-reveal
               className="mt-6 text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl light:text-ink-900"
             >
-              One price. Every template. Forever.
+              One plan. Everything included.
             </h1>
             <p data-reveal className="mt-5 text-lg text-ink-200 light:text-ink-600">
-              No subscription. No tiers. Pay once and get everything DeckForge ships — current and
-              future.
+              No tiers, no add-ons. One monthly subscription unlocks every report template and
+              integration DeckForge ships — current and future. Cancel anytime.
             </p>
           </Reveal>
         </div>
@@ -110,7 +110,7 @@ export default async function PricingPage() {
                     : "text-xs font-medium uppercase tracking-wider text-accent-500"
                 }
               >
-                DeckForge All-Access
+                DeckForge Subscription
               </p>
               {allAccess ? (
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
@@ -118,14 +118,16 @@ export default async function PricingPage() {
                     <CheckIcon className="size-7 text-emerald-300" />
                     Active
                   </span>
-                  <span className="text-sm text-ink-300">lifetime access</span>
+                  <span className="text-sm text-ink-300">subscription</span>
                 </div>
               ) : (
                 <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
                   <span className="text-4xl font-semibold tracking-tight text-white sm:text-5xl light:text-ink-900">
                     {price?.display ?? "—"}
                   </span>
-                  <span className="text-sm text-ink-300 light:text-ink-500">one-time · lifetime access</span>
+                  <span className="text-sm text-ink-300 light:text-ink-500">
+                    {price?.interval ? `per ${price.interval} · cancel anytime` : "cancel anytime"}
+                  </span>
                 </div>
               )}
             </div>
@@ -143,14 +145,14 @@ export default async function PricingPage() {
               <PrimaryCta
                 signedIn={signedIn}
                 allAccess={allAccess}
-                priceDisplay={price?.display ?? null}
+                priceDisplay={price?.displayWithInterval ?? null}
               />
               <p className="mt-3 text-xs text-ink-300 light:text-ink-500">
                 {allAccess
-                  ? "Templates open in their own app, in a new tab. Manage billing on the account page."
+                  ? "Reports open in their own app, in a new tab. Manage your subscription on the account page."
                   : signedIn
-                    ? "Secure checkout via Stripe. Tax calculated automatically at checkout."
-                    : "Free to browse the gallery. Pay only when you want to open a template."}
+                    ? "Secure checkout via Stripe. Cancel anytime. Tax calculated automatically at checkout."
+                    : "Free to browse. Subscribe when you're ready to open a report."}
               </p>
             </div>
           </div>
@@ -236,7 +238,7 @@ function PrimaryCta({
   return (
     <form action={startCheckout}>
       <button type="submit" className={buttonClass}>
-        {priceDisplay ? `Get all-access — ${priceDisplay}` : "Get all-access"}
+        {priceDisplay ? `Subscribe — ${priceDisplay}` : "Subscribe"}
       </button>
     </form>
   );
@@ -261,7 +263,7 @@ function CheckIcon({ className }: { className?: string }) {
 
 async function getAllAccessPriceSafe() {
   try {
-    return await getAllAccessPrice();
+    return await getSubscriptionPrice();
   } catch (err) {
     console.error("[pricing] failed to load all-access price:", err);
     return null;

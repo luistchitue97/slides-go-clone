@@ -15,6 +15,13 @@
       "when": 1780080310637,
       "tag": "0001_tense_grim_reaper",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1780483864997,
+      "tag": "0002_burly_ironclad",
+      "breakpoints": true
     }
   ]
 }

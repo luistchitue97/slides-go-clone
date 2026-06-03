@@ -2,20 +2,20 @@
 
 import { redirect } from "next/navigation";
 import { withAuth } from "@workos-inc/authkit-nextjs";
-import { getAllAccessPrice, getStripe } from "@/lib/stripe";
+import { getSubscriptionPrice, getStripe } from "@/lib/stripe";
 import { getEntitlements } from "@/lib/entitlements";
 import { SITE_URL } from "@/lib/site";
 
 /**
- * Server action that creates a Stripe Checkout Session for the all-access
- * pass and redirects the user to Stripe's hosted page.
+ * Server action that creates a Stripe Checkout Session for the monthly
+ * subscription and redirects the user to Stripe's hosted page.
  *
  * Form input:
  *   - `returnSlug` (optional): if the user cancels, they land back on
  *     /templates/<slug>; otherwise on /reports.
  *
- * Already-entitled users are short-circuited to /reports so they don't
- * accidentally double-buy.
+ * Already-subscribed users are short-circuited to /reports so they don't
+ * accidentally double-subscribe.
  */
 export async function startCheckout(formData: FormData) {
   const { user } = await withAuth({ ensureSignedIn: true });
@@ -25,18 +25,20 @@ export async function startCheckout(formData: FormData) {
     redirect("/reports?already_purchased=1");
   }
 
-  const price = await getAllAccessPrice();
+  const price = await getSubscriptionPrice();
   const slug = readReturnSlug(formData);
 
   const stripe = getStripe();
   const session = await stripe.checkout.sessions.create({
-    mode: "payment",
+    mode: "subscription",
     line_items: [{ price: price.id, quantity: 1 }],
     // Encodes the WorkOS user id so the webhook can grant access to the
     // right user, even if customer_email differs from the WorkOS email.
+    // Also copied onto the subscription's metadata for lifecycle events.
     client_reference_id: user.id,
     customer_email: user.email ?? undefined,
-    metadata: { kind: "all_access" },
+    metadata: { kind: "subscription", workos_user_id: user.id },
+    subscription_data: { metadata: { workos_user_id: user.id } },
     // Stripe Tax requires a customer location; Hosted Checkout collects
     // the billing address automatically when this is enabled.
     automatic_tax: { enabled: true },

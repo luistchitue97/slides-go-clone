@@ -44,7 +44,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Sea
         <div>
           <dt className="text-ink-300 light:text-ink-500">Plan</dt>
           <dd className="mt-1 text-ink-100 light:text-ink-800">
-            {entitlements.allAccess ? "All-access · lifetime" : "Free"}
+            {entitlements.allAccess ? "Subscribed · active" : "Free"}
           </dd>
         </div>
       </dl>

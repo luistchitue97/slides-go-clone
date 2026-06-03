@@ -1,13 +1,18 @@
 import { cache } from "react";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { purchases } from "@/db/schema";
+import { subscriptions } from "@/db/schema";
 
 export type Entitlements = {
   allAccess: boolean;
 };
 
 export const NO_ENTITLEMENTS: Entitlements = { allAccess: false };
+
+// Statuses that keep a subscriber's access on. `past_due` is included as a
+// grace period — Stripe is still retrying the payment; we revoke only once
+// it fully lapses (canceled/unpaid) or the subscription is deleted.
+const ACTIVE_STATUSES = new Set(["active", "trialing", "past_due"]);
 
 /**
  * Read entitlements for a WorkOS user. Memoized per-request via React.cache
@@ -29,12 +34,12 @@ export const getEntitlements = cache(
 
     try {
       const rows = await db
-        .select({ kind: purchases.kind })
-        .from(purchases)
-        .where(eq(purchases.userId, userId));
+        .select({ status: subscriptions.status })
+        .from(subscriptions)
+        .where(eq(subscriptions.userId, userId));
 
       return {
-        allAccess: rows.some((r) => r.kind === "all_access"),
+        allAccess: rows.some((r) => ACTIVE_STATUSES.has(r.status)),
       };
     } catch (err) {
       console.error("[entitlements] DB read failed; defaulting to no access:", err);
