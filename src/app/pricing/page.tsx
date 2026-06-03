@@ -90,9 +90,12 @@ export default async function PricingPage() {
             </p>
             <h1
               data-reveal
-              className="mt-6 text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl light:text-ink-900"
+              className="mt-6 text-balance text-4xl font-bold tracking-tight text-white sm:text-6xl lg:text-[72px] lg:leading-[1.03] light:text-ink-900"
             >
-              One plan. Everything included.
+              One plan.{" "}
+              <span className="bg-gradient-to-r from-brand-300 to-accent-400 bg-clip-text text-transparent light:from-brand-600 light:to-accent-500">
+                Everything included.
+              </span>
             </h1>
             <p data-reveal className="mt-5 text-lg text-ink-200 light:text-ink-600">
               No tiers, no add-ons. One monthly subscription unlocks every report template and

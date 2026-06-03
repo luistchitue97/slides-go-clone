@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import gsap from "gsap";
 
 /**
@@ -35,6 +36,9 @@ type StreakRef = { perp: number };
 
 export function PageBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  // The effect is more prominent on the landing page; everywhere else it stays
+  // a subtle backdrop so it never competes with content.
+  const isHome = usePathname() === "/";
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -221,8 +225,8 @@ export function PageBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 -z-10 h-full w-full opacity-50 hidden lg:block"
-      style={{ filter: "blur(3px)" }}
+      className={`fixed inset-0 -z-10 hidden h-full w-full lg:block ${isHome ? "opacity-90" : "opacity-50"}`}
+      style={{ filter: isHome ? "blur(1.5px)" : "blur(3px)" }}
       aria-hidden
     />
   );
