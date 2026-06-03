@@ -38,6 +38,9 @@ dependencies:
   stripe:
     specifier: ^22.2.0
     version: 22.2.0(@types/node@20.19.27)
+  zod:
+    specifier: ^4.4.3
+    version: 4.4.3
 
 devDependencies:
   '@tailwindcss/postcss':
@@ -4750,3 +4753,7 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
+
+  /zod@4.4.3:
+    resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
+    dev: false
