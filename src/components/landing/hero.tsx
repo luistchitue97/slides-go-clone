@@ -24,17 +24,19 @@ export function Hero({ signedIn, allAccess, priceDisplay }: Props) {
             data-reveal
             className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs uppercase tracking-wider text-ink-200 light:border-ink-900/10 light:bg-ink-100/60 light:text-ink-500"
           >
-            <span className="size-1.5 rounded-full bg-accent-500" />
+            <span className="size-1.5 animate-pulse rounded-full bg-accent-500" />
             {allAccess ? "Subscription active" : "AI-Native Reporting Platform"}
           </p>
           <h1
             data-reveal
-            className="mt-6 text-4xl font-semibold tracking-tight text-white sm:text-6xl lg:text-[68px] lg:leading-[1.04] light:text-ink-900"
+            className="mt-6 text-balance text-4xl font-bold tracking-tight text-white sm:text-6xl lg:text-[72px] lg:leading-[1.03] light:text-ink-900"
           >
             Your company data.{" "}
-            <span className="text-ink-300 light:text-ink-500">Turned into executive-ready decks.</span>
+            <span className="bg-gradient-to-r from-brand-300 to-accent-400 bg-clip-text text-transparent light:from-brand-600 light:to-accent-500">
+              Turned into <span className="whitespace-nowrap">executive-ready</span> decks.
+            </span>
           </h1>
-          <p data-reveal className="mt-6 max-w-xl text-lg text-ink-200 sm:text-xl light:text-ink-600">
+          <p data-reveal className="mt-6 max-w-xl text-pretty text-lg leading-relaxed text-ink-100 sm:text-xl light:text-ink-600">
             Auto-generate QBRs, board decks, and investor updates from your live data — cinematic,
             web-native, fully editable.
           </p>
