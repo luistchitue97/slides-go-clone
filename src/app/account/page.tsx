@@ -43,7 +43,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Sear
       </div>
 
       {activeTab === "settings" ? (
-        <div className="flex max-w-2xl flex-col gap-6">
+        <div className="flex flex-col gap-6">
           {showSuccess ? <PurchaseSuccessBanner allAccess={entitlements.allAccess} /> : null}
 
           {impersonator ? (
